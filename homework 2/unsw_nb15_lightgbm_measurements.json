@@ -1,0 +1,73 @@
+{
+  "dataset": {
+    "data_path": "/Users/logangarcia/Downloads/bax423/homework 2/DataFiles/UNSW-NB15_1.csv",
+    "feature_schema_path": "/Users/logangarcia/Downloads/bax423/homework 2/DataFiles/NUSW-NB15_features.csv",
+    "rows": 700001,
+    "columns": 49,
+    "test_size": 0.2,
+    "random_state": 808
+  },
+  "binary_models": [
+    {
+      "Model": "Deeper trees (num_leaves=127)",
+      "Train Time (s)": 5.51638075000119,
+      "Inference Time (s)": 0.16657950000080746,
+      "Total Load (s)": 5.682960250001997,
+      "Estimated Full Inference Load (s)": 0.8328927406237472,
+      "Estimated Full Total Load (s)": 6.349273490624937,
+      "Binary Accuracy": 0.99766430239784,
+      "Imbalance Handling": "is_unbalance=True"
+    },
+    {
+      "Model": "GOSS boosting",
+      "Train Time (s)": 2.579909583000699,
+      "Inference Time (s)": 0.09640533300080278,
+      "Total Load (s)": 2.676314916001502,
+      "Estimated Full Inference Load (s)": 0.4820239105856026,
+      "Estimated Full Total Load (s)": 3.061933493586302,
+      "Binary Accuracy": 0.9961357418875579,
+      "Imbalance Handling": "is_unbalance=True"
+    },
+    {
+      "Model": "Vanilla LGBM",
+      "Train Time (s)": 2.2395524170005956,
+      "Inference Time (s)": 0.10689862499930314,
+      "Total Load (s)": 2.3464510419998987,
+      "Estimated Full Inference Load (s)": 0.534490070771903,
+      "Estimated Full Total Load (s)": 2.7740424877724985,
+      "Binary Accuracy": 0.9960714566324527,
+      "Imbalance Handling": "is_unbalance=True"
+    },
+    {
+      "Model": "XGBoost (scale_pos_weight)",
+      "Train Time (s)": 4.904172291999203,
+      "Inference Time (s)": 0.051909750000049826,
+      "Total Load (s)": 4.956082041999252,
+      "Estimated Full Inference Load (s)": 0.2595472668751286,
+      "Estimated Full Total Load (s)": 5.163719558874331,
+      "Binary Accuracy": 0.9959643145406104,
+      "Imbalance Handling": "scale_pos_weight=30.5102"
+    },
+    {
+      "Model": "Bagging 50% row subsample",
+      "Train Time (s)": 2.6894759999995586,
+      "Inference Time (s)": 0.10105912499966507,
+      "Total Load (s)": 2.7905351249992236,
+      "Estimated Full Inference Load (s)": 0.5052927376153781,
+      "Estimated Full Total Load (s)": 3.1947687376149365,
+      "Binary Accuracy": 0.995671459489575,
+      "Imbalance Handling": "is_unbalance=True"
+    }
+  ],
+  "multiclass_model": {
+    "Model": "Multiclass LGBM",
+    "Train Time (s)": 29.857098540998777,
+    "Inference Time (s)": 2.089407540999673,
+    "Total Load (s)": 31.94650608199845,
+    "Estimated Full Inference Load (s)": 10.446978008066457,
+    "Estimated Full Total Load (s)": 40.304076549065236,
+    "Multiclass Accuracy": 0.9896429311219206,
+    "Imbalance Handling": "class_weight='balanced'",
+    "Num Classes": 10
+  }
+}
