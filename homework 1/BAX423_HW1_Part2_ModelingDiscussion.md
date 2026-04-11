@@ -1,32 +1,24 @@
-# BAX 423 — Homework 1 — Part 2 — Modeling & data decisions (for PDF item 2d)
+# Part 2 — Modeling and data choices
 
-**Group:** Logan Garcia, Bonnie Hines  
+**Logan Garcia, Bonnie Hines**
 
-Fill in the bracketed numbers from your training log (`finetune.py` on Colab/GPU or `finetune_mlx.py` on Mac).
+## Modeling decisions
 
-## Decisions
+We fine-tuned a transformer encoder for binary classification on the Newswire civil-rights label. The handout starter uses **DistilBERT** (`distilbert-base-uncased`) in `finetune.py`: fewer layers than full BERT, with similar behavior on text classification and reasonable GPU memory use.
 
-1. **Encoder:** Course starter uses **DistilBERT** (`distilbert-base-uncased`) in `finetune.py`. DistilBERT retains much of BERT’s accuracy with fewer layers — good for historical news text and GPU memory.
+We used **max length 225** tokens to match the assignment cap and avoid padding every example to 512. Training data were split **80/20** train/validation with seed **808**. We report **accuracy** on the held-out test set (rubric asks for at least **93%**) and also look at **precision, recall, and F1 on the positive (civil rights) class** because the classes are not perfectly balanced. Optimization follows a standard setup: **AdamW**, weight decay, and a small number of epochs with learning rate per the starter.
 
-2. **Sequence length 225:** Matches the assignment cap; truncates very long OCR articles without padding the entire corpus to 512.
+For local runs on Apple Silicon we used an optional **MLX** script (`finetune_mlx.py`) with **BERT-base** weights from the Hugging Face Hub; the starter DistilBERT run should be taken from `finetune.py` on a **GPU** when comparing to the official notebook.
 
-3. **Whitespace cleanup:** Collapsing repeated spaces reduces noise from scanning/layout without aggressive stemming that could hurt rare civil-rights terms.
+## Results
 
-4. **Train/validation split:** 80/20 with fixed seed (808) for reproducibility.
+Numbers below come from the training run output (GPU run of `finetune.py` and/or Mac run of `finetune_mlx.py`).
 
-5. **Metrics:** Accuracy for the overall rubric target (≥93%); **precision/recall/F1 on the positive (civil rights) class** because the label distribution is imbalanced — success on the minority class matters for this task.
-
-6. **Optimization:** AdamW with weight decay, warmup, a few epochs — standard GLUE-style fine-tuning for BERT-family models.
-
-## Results (paste from your run)
-
-| Field | Value |
+| Metric | Value |
 |--------|--------|
-| Best / final **test accuracy** | _paste_ |
-| **eval_loss** (cross-entropy) | _paste_ |
-| **exp(eval_loss)** (perplexity-style scalar) | _paste_ |
-| **Peak CPU** (e.g. Activity Monitor / `ru_maxrss`) | _paste_ |
-| **Peak GPU** (nvidia-smi / Colab) | _paste from GPU run_ |
-| **Wall-clock training time** | _paste_ |
-
-**Note:** For Apple Silicon MLX (`finetune_mlx.py`), use **bert-base-uncased** weights from Hugging Face `mlx-community/bert-base-uncased-mlx` for speed; for strict DistilBERT parity, run `finetune.py` on a **GPU** and paste those numbers here.
+| Test accuracy | |
+| Cross-entropy (eval) | |
+| exp(cross-entropy) | |
+| Peak CPU memory (e.g. `ru_maxrss` on Mac) | |
+| Peak GPU memory (if applicable) | |
+| Training time (wall clock) | |

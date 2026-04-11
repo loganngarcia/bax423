@@ -29,7 +29,7 @@ YEARS = list(range(2020, 2026))  # 2020–2025 inclusive
 OUT_DIR = Path(__file__).resolve().parent / "output"
 EF_STRONG = {"EF2", "EF3", "EF4", "EF5"}
 
-# --- Part 4(d): names for PDF/HTML (edit GROUP_NAME_CANVAS to match Canvas roster) ---
+# Names as they should appear on the PDF/HTML cover (match Canvas if required).
 GROUP_MEMBERS = "Logan Garcia, Bonnie Hines"
 GROUP_NAME_CANVAS = "Logan Garcia & Bonnie Hines"
 

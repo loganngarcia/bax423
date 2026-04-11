@@ -2,4 +2,4 @@
 
 **Bonnie Hines** and **Logan Garcia**
 
-Homework and course work — details are in [`homework 1/README.md`](homework%201/README.md).
+Homework materials: see [`homework 1/README.md`](homework%201/README.md).

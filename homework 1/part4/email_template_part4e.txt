@@ -1,0 +1,16 @@
+BAX 423 — Homework 1 — Part 4(e)
+
+Use a personal Gmail account (not your university email), as required by the assignment.
+
+To: [instructor email from the syllabus]
+Subject: BAX423 Tornado Watch
+
+Body:
+
+Ask the assistant to avoid [STATE NAMES — comma-separated, from your analysis] in the month of May,
+using the states where May is the peak month for EF2+ tornadoes in your NOAA run
+(see output/summary.json: states_where_may_is_peak_month).
+
+Closing line:
+From [your Canvas group name]
+Logan Garcia, Bonnie Hines

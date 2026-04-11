@@ -1,33 +1,19 @@
 #!/usr/bin/env python3
 """
-BAX 423 HW1 — Part 2 — Apple Silicon fast path (MLX + BERT-base).
+BAX 423 Homework 1 — Part 2 — Newswire classification (optional MLX path).
 
-PyTorch + MPS on Mac is often **~1–2 steps/s** on this assignment (many hours for 3 epochs).
-This script uses **Apple MLX** with **bert-base-uncased** (same uncased WordPiece tokenizer
-family as DistilBERT; backbone is full BERT). Typical MLX throughput here is **~5–15+ steps/s**
-on recent M-series chips, so expect on the order of **~20–60 minutes** for 3 epochs instead of
-**~3–6+ hours** with PyTorch+MPS — exact time depends on RAM and chip tier.
+Fine-tunes BERT-base with Apple MLX for machines without CUDA. Pretrained weights are loaded from
+Hugging Face: mlx-community/bert-base-uncased-mlx (weights.npz). The course handout uses
+DistilBERT in finetune.py; use that script on Colab/GPU for an exact match to the starter.
 
-**Weights (Hugging Face Hub, not a manual GitHub clone):** pretrained MLX `weights.npz` are loaded
-from **`mlx-community/bert-base-uncased-mlx`** (see https://huggingface.co/mlx-community/bert-base-uncased-mlx ).
-That repo is the best match for this repo’s `mlx_bert/model.py` (mlx-examples–style BERT). Hub search
-also lists `mlx-community/bert-large-uncased-mlx` (larger/slower) and encoder-adjacent MLX repos; a
-**DistilBERT** classification checkpoint such as `Mlxa/atd-distilbert` uses **safetensors + Transformers**,
-not this raw `weights.npz` layout — use **`finetune.py`** on GPU/Colab for the assignment’s DistilBERT
-starter if you need that exact architecture.
-
-Keep `finetune.py` for Colab/CUDA submission if the grader expects the exact DistilBERT starter;
-submit this log + notebook as your “local fast” run.
-
-Usage:
-  cd "homework 1" && source .venv/bin/activate
-  pip install mlx datasets transformers numpy scikit-learn huggingface_hub
-  python finetune_mlx.py
+Options:  --fast   train on a random subset with fewer epochs for shorter local runs.
 """
 
 from __future__ import annotations
 
+import argparse
 import math
+import os
 import sys
 import time
 from pathlib import Path
@@ -48,7 +34,6 @@ if str(_ROOT) not in sys.path:
 from mlx_bert.model import Bert  # noqa: E402
 
 BERT_NAME = "bert-base-uncased"
-# HF Hub: mlx-community — official MLX BERT-base weights (npz), compatible with mlx_bert/model.py
 HF_MLX_REPO = "mlx-community/bert-base-uncased-mlx"
 MAX_LEN = 225
 BATCH_SIZE = 48
@@ -56,6 +41,9 @@ EPOCHS = 3
 LR = 2e-5
 WEIGHT_DECAY = 0.01
 SEED = 808
+FAST_MAX_TRAIN = 20_000
+FAST_EPOCHS = 2
+FAST_LR = 3e-5
 
 
 class BertForSequenceClassificationMLX(nn.Module):
@@ -106,7 +94,35 @@ def resolve_mlx_weights_npz() -> str:
         return str(fallback)
 
 
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="MLX BERT fine-tune — BAX 423 HW1 Part 2 (optional)")
+    p.add_argument(
+        "--fast",
+        action="store_true",
+        help="Train on a random subset of rows and fewer epochs (faster on laptop).",
+    )
+    p.add_argument("--max-train-examples", type=int, default=None, help="Cap training rows (after split).")
+    p.add_argument("--epochs", type=int, default=None, help="Override epoch count.")
+    p.add_argument("--lr", type=float, default=None, help="Learning rate (default: 2e-5, or 3e-5 with --fast).")
+    return p.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    fast = args.fast or os.environ.get("BAX423_FAST", "").strip().lower() in ("1", "true", "yes", "y")
+
+    epochs = args.epochs if args.epochs is not None else EPOCHS
+    max_train_examples = args.max_train_examples
+    lr = args.lr if args.lr is not None else LR
+
+    if fast:
+        if args.epochs is None:
+            epochs = FAST_EPOCHS
+        if args.max_train_examples is None:
+            max_train_examples = FAST_MAX_TRAIN
+        if args.lr is None:
+            lr = FAST_LR
+
     mx.random.seed(SEED)
     np.random.seed(SEED)
 
@@ -156,6 +172,18 @@ def main() -> None:
     train_mask = np.asarray(train_ds["attention_mask"], dtype=np.float32)
     train_y = np.asarray(train_ds["labels"], dtype=np.int32)
 
+    n_full = len(train_y)
+    if max_train_examples is not None and n_full > max_train_examples:
+        rng = np.random.default_rng(SEED)
+        sub = rng.choice(n_full, size=max_train_examples, replace=False)
+        train_ids = train_ids[sub]
+        train_mask = train_mask[sub]
+        train_y = train_y[sub]
+        print(
+            f"Training on {max_train_examples:,} of {n_full:,} training examples (subset).",
+            flush=True,
+        )
+
     test_ids = np.asarray(test_ds["input_ids"], dtype=np.int32)
     test_mask = np.asarray(test_ds["attention_mask"], dtype=np.float32)
     test_y = np.asarray(test_ds["labels"], dtype=np.int32)
@@ -164,23 +192,23 @@ def main() -> None:
     model = BertForSequenceClassificationMLX(config, num_labels=2)
     model.bert.load_weights(weights_path)
 
-    optimizer = AdamW(learning_rate=LR, weight_decay=WEIGHT_DECAY)
+    optimizer = AdamW(learning_rate=lr, weight_decay=WEIGHT_DECAY)
 
     n_train = len(train_y)
     steps_per_epoch = math.ceil(n_train / BATCH_SIZE)
-    total_steps = steps_per_epoch * EPOCHS
+    total_steps = steps_per_epoch * epochs
 
     print(
-        f"MLX train | n={n_train} batch={BATCH_SIZE} epochs={EPOCHS} → ~{total_steps} optimizer steps",
+        f"MLX train | n={n_train} batch={BATCH_SIZE} epochs={epochs} lr={lr:g} "
+        f"→ ~{total_steps} optimizer steps",
         flush=True,
     )
-
     idx = np.arange(n_train)
     global_step = 0
     t0 = time.perf_counter()
 
     model.train()
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         np.random.shuffle(idx)
         ep_loss = 0.0
         nb = 0
@@ -208,10 +236,14 @@ def main() -> None:
                 sps = global_step / max(dt, 1e-6)
                 print(
                     f"  step {global_step}/{total_steps}  loss={float(loss):.4f}  "
-                    f"~{sps:.1f} step/s  {dt/60:.1f} min elapsed"
+                    f"~{sps:.1f} step/s  {dt/60:.1f} min elapsed",
+                    flush=True,
                 )
 
-        print(f"Epoch {epoch + 1}/{EPOCHS} — mean batch loss: {ep_loss / max(1, nb):.4f}")
+        print(
+            f"Epoch {epoch + 1}/{epochs} — mean batch loss: {ep_loss / max(1, nb):.4f}",
+            flush=True,
+        )
 
     wall = time.perf_counter() - t0
     print(f"\nTraining wall time: {wall/60:.1f} min ({wall:.0f} s)")
@@ -252,20 +284,15 @@ def main() -> None:
     print(f"exp(mean CE) (perplexity-style): {math.exp(mean_ce):.4f}")
 
     if acc < 0.93:
-        print(
-            "\nIf accuracy is below 93%, increase EPOCHS to 4 or LR to 3e-5, "
-            "or use the PyTorch `finetune.py` on a GPU runtime."
-        )
+        print("Test accuracy is below 0.93; try more epochs, tuning LR, or finetune.py on GPU.")
 
-    # Rubric Part 2(e): resource usage (best effort on macOS; no NVIDIA GPU on Apple Silicon)
     try:
         import resource
 
         ru = resource.getrusage(resource.RUSAGE_SELF)
-        print(f"Peak RSS (ru_maxrss, OS-dependent units): {ru.ru_maxrss}")
+        print(f"Peak RSS (ru_maxrss): {ru.ru_maxrss}")
     except Exception as e:
         print("Could not read RSS:", e)
-    print("(GPU usage: N/A on typical Mac — use Colab/CUDA log from finetune.py if required.)")
 
 
 if __name__ == "__main__":

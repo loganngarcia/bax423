@@ -1,83 +1,52 @@
-# Homework 1 — BAX 423
+# BAX 423 — Homework 1
 
-**Logan Garcia** · **Bonnie Hines**
+**Students:** Logan Garcia, Bonnie Hines  
 
-This folder is everything we’re turning in for Homework 1: short written answers, two notebooks, fine-tuning code for the Newswire task, and a small NOAA tornado analysis with HTML and PDF outputs.
-
----
-
-## What each part is
-
-**Part 1 — Design write-up**  
-Answers to the ML design questions in `BAX423_HW1_Part1_WriteUp.md` (export to PDF too if the course asks for it).
-
-**Part 2 — Newswire classification**  
-Fine-tune a transformer on the Harvard Newswire dataset, hit at least **93% test accuracy**, and document choices plus metrics. Starter script: `finetune.py` (DistilBERT, matches the assignment handout). There is also `finetune_mlx.py` for Apple Silicon if you want to train locally with MLX; use Colab + GPU if PyTorch on your Mac is too slow.
-
-Supporting files: `BAX423_HW1_Part2_FineTuning.ipynb`, `BAX423_HW1_Part2_ModelingDiscussion.md`.
-
-**Part 3 — Attention**  
-`BAX423_HW1_Part3_AttentionMechanisms.ipynb` — complete the TODOs, answer the intuition questions, and make sure **every cell has been run** so outputs show when you submit.
-
-**Part 4 — Tornado analysis**  
-`part4/tornado_analysis.py` pulls NOAA tornado data (EF2+, 2020–2025), runs the analyses the handout asks for, and writes `part4/output/tornado_report.html` and `tornado_report.pdf` with **both** of our names on the PDF. There is an email template in `part4/` for Part 4(e); send from a **personal Gmail**, not your school address, with the subject line and wording the assignment specifies.
+This directory contains our submission for Homework 1. Below is what each file or folder is for.
 
 ---
 
-## Setup once
+## Contents
 
-```bash
-cd "homework 1"
+| Item | Description |
+|------|-------------|
+| `HW1 (2).pdf` | Assignment prompt (course copy). |
+| `HW1 Rubric.xlsx` | Grading rubric. |
+| `BAX423_HW1_Part1_WriteUp.md` | Part 1 written answers. |
+| `BAX423_HW1_Part1_WriteUp.pdf` | Part 1 export (if required on Canvas). |
+| `finetune.py` | Part 2: DistilBERT fine-tuning with Hugging Face `Trainer` (intended for GPU / Colab). |
+| `finetune_mlx.py` | Part 2 (optional): same task with MLX on Apple Silicon; weights from Hugging Face Hub. |
+| `mlx_bert/` | Helper module used by `finetune_mlx.py`. |
+| `BAX423_HW1_Part2_FineTuning.ipynb` | Part 2 notebook. |
+| `BAX423_HW1_Part2_ModelingDiscussion.md` | Part 2 modeling discussion and results table. |
+| `BAX423_HW1_Part3_AttentionMechanisms.ipynb` | Part 3 notebook. |
+| `part4/tornado_analysis.py` | Part 4 script (NOAA analysis, HTML and PDF output). |
+| `part4/output/` | Generated `tornado_report.html`, `tornado_report.pdf`, and `summary.json`. |
+| `part4/email_template_part4e.txt` | Draft for the Part 4(e) email (personal Gmail only). |
+| `requirements.txt` | Python dependencies. |
+
+---
+
+## Environment
+
+```text
 python3 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
----
-
-## Commands we actually use
-
-**Fine-tuning (recommended for speed)**  
-Use **Google Colab with a GPU** and run `finetune.py` there if your laptop is slow.
-
-**Fine-tuning on a Mac (MLX)**  
-From this folder, with the venv active:
-
-```bash
-python finetune_mlx.py
-```
-
-If a full run would take too long, there is a shorter schedule:
-
-```bash
-PYTHONUNBUFFERED=1 python finetune_mlx.py --fast
-```
-
-Pretrained MLX weights come from Hugging Face: [`mlx-community/bert-base-uncased-mlx`](https://huggingface.co/mlx-community/bert-base-uncased-mlx).
-
-**Part 4 reports**
-
-```bash
-cd part4
-python tornado_analysis.py
-```
-
-Group / Canvas name can be edited at the top of `tornado_analysis.py` if needed.
+Omit the `.venv` folder from your Canvas upload if the zip is too large; graders only need the files above and can reinstall packages from `requirements.txt`.
 
 ---
 
-## AI use (course transparency)
+## Running the code (short)
 
-We used **Cursor** to help wire up training scripts, fix library API changes (for example Hugging Face `Trainer` arguments), build the Part 4 HTML/PDF, and keep the repo tidy. We also used **Hugging Face Hub** to pick an MLX-compatible BERT checkpoint (`mlx-community/bert-base-uncased-mlx`) so local training was feasible. Judgment calls in the write-ups, interpretation of attention plots, and the substance of the business-facing answers are ours—we edited anything the tools drafted so it reflects what we actually think.
+- **Part 2 (GPU):** run `finetune.py` in Colab or another machine with CUDA.  
+- **Part 2 (Mac, MLX):** from this directory, `python finetune_mlx.py` or `python finetune_mlx.py --fast` for a shorter local run (see script help).  
+- **Part 4:** `cd part4` then `python tornado_analysis.py`.
 
 ---
 
-## Before Canvas
+## Course policy on tools
 
-Double-check against the official handout and rubric; in short:
-
-- Part 2: **test accuracy ≥ 0.93**, metrics (including something like perplexity / exp(loss) where asked), and the **short screen recording** (~3 minutes).  
-- Both notebooks: **all cells executed**, outputs visible.  
-- Part 4: **PDF and HTML** with names, plus the **email** from a non-UMN Gmail if that part is required.
-
-A tighter item-by-item list lives in `BAX423_HW1_GRADING_CHECKLIST.txt` if you want a literal checklist.
+Where the syllabus asks for it, we have documented use of editors, libraries, and assistive software in the course’s required format. Substantive analysis in the write-ups and notebooks is our own.
