@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 """
-BAX 423 HW1 — Part 4 — NOAA Storm Events: EF2+ tornadoes (2020–2025).
+BAX 423 Homework 1 — Part 4 — NOAA Storm Events database.
 
-Downloads annual Storm Events *details* CSV.gz files from NCEI, filters tornado rows,
-keeps Enhanced Fujita EF2–EF5, and writes:
-  - summary.json
-  - report.html
-  - tornado_report.pdf (ReportLab — group names included)
+EF2+ tornadoes, 2020–2025: download NCEI Storm Events detail CSVs, filter and analyze,
+write summary.json, tornado_report.html, and tornado_report.pdf (group names on the PDF).
 
-Tie-break for "highest frequency month per state": if two months tie, pick the
-earlier calendar month (smallest month number).
+Peak month per state uses tie-break: if two months tie, use the earlier month (smallest number).
 """
 
 from __future__ import annotations

@@ -1,11 +1,11 @@
 # HW1 submission
 
-Logan Garcia, Bonnie Hines
+Logan Garcia, Bonnie Hines · Due Apr 10, 2026 (11:59 pm) per handout
 
-Main stuff to grade: Part 1 writeup (`BAX423_HW1_Part1_WriteUp.md` + pdf), both notebooks (`BAX423_HW1_Part2_FineTuning.ipynb`, `BAX423_HW1_Part3_AttentionMechanisms.ipynb`), `finetune.py`, modeling writeup for part 2 (`BAX423_HW1_Part2_ModelingDiscussion.md`), and part 4 (`part4/tornado_analysis.py` plus `part4/output/` html pdf json). Video for part 2 goes on Canvas separately.
+Canvas (same list as the assignment PDF): Part 1 writeup; Part 2 and Part 3 notebooks with all cells run; `finetune.py`; Part 4 Python + generated HTML; short Part 2 screen recording (.mp4) uploaded separately.
 
-Extra: `finetune_mlx.py` and `mlx_bert/` are an optional MLX run on Mac if you want to look; main line is still `finetune.py` on GPU. Assignment pdf and rubric xlsx are in here too for our reference.
+What’s in this folder: Part 1 `BAX423_HW1_Part1_WriteUp.md` (+ pdf export); Part 2 `finetune.py`, `BAX423_HW1_Part2_FineTuning.ipynb`, `BAX423_HW1_Part2_ModelingDiscussion.md`; Part 3 `BAX423_HW1_Part3_AttentionMechanisms.ipynb`; Part 4 `part4/tornado_analysis.py` and `part4/output/` (html, pdf, json). Optional extra for Mac: `finetune_mlx.py` and `mlx_bert/`. Rubric and assignment PDF are included as `HW1 Rubric.xlsx` and `HW1 (2).pdf`.
 
-If you need to rerun anything: `pip install -r requirements.txt`, then part 2 use Colab for `finetune.py` or locally `python finetune_mlx.py` / `--fast`, part 4 is `cd part4` and `python tornado_analysis.py`. Skip uploading `.venv` if the zip is huge.
+Rerun: `pip install -r requirements.txt`; run Part 2 on Colab GPU (`finetune.py` via the notebook); Part 4: `cd part4` then `python tornado_analysis.py`. Omit `.venv` from the zip if it’s enormous.
 
-AI / tool use is documented wherever the syllabus asked for it; analysis in the writeups is ours.
+Part 4(e) email draft: `part4/email_template_part4e.txt`.
