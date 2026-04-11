@@ -1,23 +1,23 @@
-# BAX 423 Homework 2 — Written responses (Parts 2–4)
+# BAX 423 Homework 2 Written responses (Parts 2 through 4)
 
 Logan Garcia, Bonnie Hines
 
-## Part 2 (Count–Min Sketch, CMS)
+## Part 2 Count-Min Sketch and the histogram
 
-**False negatives vs false positives when thresholding CMS estimates.** Count–Min Sketch estimates are **one-sided** in the usual sense that each estimate is **at least** the true count in expectation for the min across rows, but **collisions** can **inflate** counts. When we flag “attack” using a fixed threshold on estimated flows, **false positives** (benign sources pushed over the threshold) are usually the main worry with a **small width**, because hash collisions add noise upward. **False negatives** (true high-volume sources reported below the threshold) can still happen, but they are less typical than inflation when the table is narrow. Tuning **width and depth** trades memory for collision noise.
+When you threshold sketch counts to call something an attack, collisions matter more than the “minimum across rows is unbiased” story from lecture. A skinny table collides a lot, so counts get pushed up. In our setup that usually shows up as false positives, meaning a quiet source can look hot. False negatives can happen, but undercounting every row is not what CMS is famous for, so you sweat width and depth before you trust the histogram as ground truth.
 
-## Part 3 (LightGBM vs XGBoost, GOSS, EFB)
+## Part 3 LightGBM runs
 
-**Accuracy and speed.** On this UNSW-NB15 pipeline (one-hot categoricals, log-scaled nonnegative numerics), LightGBM is **competitive or better on accuracy** than the XGBoost baseline while often **training and inferring faster** on wide sparse tabular data, because it exploits histogram-based splits and efficient data layouts. Exact numbers appear in the comparison table in the notebook export JSON.
+On this tabular pipeline, LightGBM landed in the same accuracy ballpark as XGBoost, often with less wall time, which matches what you expect on wide one-hot data where histogram splits help. Exact train and infer seconds and accuracy are in `unsw_nb15_lightgbm_measurements.json` next to the notebook.
 
-**GOSS (Gradient-based One-Side Sampling).** GOSS **undersamples a large fraction of low-gradient examples** and keeps high-gradient examples, so each iteration spends work where the loss surface is changing fastest. It tries to **preserve accuracy** by reweighting so the overall gradient direction stays representative. **Speed gains** depend on whether gradient sorting and sampling overhead dominate; on smaller or already fast rounds, GOSS may not look dramatically faster.
+GOSS samples harder examples more often so each boosting round spends gradient work where the loss is moving. You can still pay for sorting and bookkeeping, so speedup is not automatic on every dataset size.
 
-**Exclusive Feature Bundling (EFB).** In LightGBM, **mutually exclusive** sparse features (rarely nonzero together) can be **packed into bundles** to reduce the effective feature dimension for histogram building. That **reduces the cost per split** and speeds training when many sparse indicators exist.
+EFB is the idea that sparse columns that almost never fire together can be bundled so the tree code touches fewer effective columns per split. That is a training-time win when your feature space is mostly indicators.
 
-## Part 4 (Range queries and dyadic intervals)
+## Part 4 Range queries on text
 
-**8000-word range vs 4000-word intervals.** If fixed sketches are aligned to **4000-word chunks**, an 8000-word range that **does not align** to those chunk boundaries mixes **partial intervals**, so error accumulates from **multiple CMS estimates** and boundary effects. Accuracy is not identical to a single aligned 8000-word block unless the query decomposes cleanly.
+If you built one sketch per fixed 4000-word chunk, an 8000-word window that does not line up on those boundaries stitches together partial chunks. You add more sketch answers, so error adds up differently than one clean 8000-word block.
 
-**Bounding error with 99% probability.** To keep total range error small with high probability, you typically **shrink the per-sketch epsilon** (wider/deeper sketches), **align interval construction** so the query is a **sum of independent or weakly dependent** sub-sketches, and accept that union bounds may require **more conservative epsilon** per block when you sum many blocks.
+If you want a 99% style guarantee on total error, you tighten each sketch, usually with a smaller epsilon per sketch and enough rows, and you stay honest about how many sketches you sum. More segments in the sum usually means you budget epsilon per segment more conservatively.
 
-**Dyadic intervals.** Any interval can be covered by **O(log L)** power-of-two aligned blocks (standard dyadic decomposition). That controls how many sketch estimates you sum when answering an arbitrary range query.
+Dyadic intervals are the usual trick so any range breaks into a handful of power-of-two aligned pieces. You query one sketch per piece and add. That is how you stop forcing every user question to match your original chunk boundaries.
