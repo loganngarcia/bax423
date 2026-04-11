@@ -21,3 +21,7 @@ If you built one sketch per fixed 4000-word chunk, an 8000-word window that does
 If you want a 99% style guarantee on total error, you tighten each sketch, usually with a smaller epsilon per sketch and enough rows, and you stay honest about how many sketches you sum. More segments in the sum usually means you budget epsilon per segment more conservatively.
 
 Dyadic intervals are the usual trick so any range breaks into a handful of power-of-two aligned pieces. You query one sketch per piece and add. That is how you stop forcing every user question to match your original chunk boundaries.
+
+## AI use
+
+We used AI in Cursor to help with grammar and to turn our spoken thoughts into written text using Cursor voice mode. The technical content is ours.

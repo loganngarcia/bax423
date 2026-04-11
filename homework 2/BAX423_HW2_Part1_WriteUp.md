@@ -36,3 +36,7 @@ One fix people actually use is a counting Bloom filter: small counters per cell,
 Picture a list of normal Bloom filters, smallest first. Inserts go into the active one. When that stage gets too full for your false positive budget, you add a new filter with more space instead of rebuilding the world from scratch.
 
 On lookup you query every stage and say yes if any stage says yes. If stage i has false positive rate ε_i and you design the series so the ε_i shrink fast enough, the total false positive rate stays below whatever cap you promised across all stages.
+
+## AI use
+
+We used AI in Cursor to help with grammar and to turn our spoken thoughts into written text using Cursor voice mode. The math and reasoning are ours.
