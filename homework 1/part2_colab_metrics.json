@@ -1,0 +1,25 @@
+{
+  "script": "finetune.py",
+  "environment": "Google Colab Pro, NVIDIA A100",
+  "seed": 808,
+  "test_rows": 28611,
+  "train_rows": 114442,
+  "epochs_trained": 4,
+  "best_model_metric": "accuracy",
+  "best_validation_epoch_note": "Val accuracy highest at epoch 2; Trainer reloads best checkpoint before predict.",
+  "test_metrics": {
+    "eval_loss": 0.028882896527647972,
+    "accuracy": 0.9909824892523854,
+    "f1_macro": 0.9610534980865577,
+    "f1_civil_rights": 0.9269121813031161,
+    "precision_civil_rights": 0.9216901408450704,
+    "recall_civil_rights": 0.9321937321937321
+  },
+  "perplexity_style_scalar_exp_ce": 1.0293,
+  "training_wall_seconds": 453.9,
+  "peak_rss_ru_maxrss_raw": 4969104,
+  "peak_rss_note_linux_kb": "ru_maxrss on Linux Colab is in kilobytes",
+  "peak_gpu_allocated_mb": 2352.193359375,
+  "nvml_gpu_total_mb": 81920.0,
+  "nvml_gpu_used_mb_sample": 3929.1875
+}

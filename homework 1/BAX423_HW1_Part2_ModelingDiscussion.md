@@ -12,18 +12,24 @@ For optional local runs on Apple Silicon we have `finetune_mlx.py` with BERT-bas
 
 ## Results
 
-Fill the **`finetune.py` Colab GPU** row after that run. Optional MLX numbers are logged in **`BAX423_HW1_Part2_MLX_results.md`** from the completed `--fast` local run.
+Below is one completed **`finetune.py`** run on **Google Colab Pro** with an **NVIDIA A100** GPU. Validation accuracy peaked at **epoch 2**; `load_best_model_at_end=True` reloads that checkpoint before the final test evaluation, so the reported test metrics match the best validation epoch, not the last epoch (epoch 4 validation loss drifted upward slightly).
+
+Optional MLX numbers stay in **`BAX423_HW1_Part2_MLX_results.md`**.
 
 ### Required: `finetune.py` on Colab GPU
 
 | Metric | Value |
 |--------|--------|
-| Test accuracy | |
-| Cross-entropy eval | |
-| exp cross-entropy | |
-| Peak CPU memory ru_maxrss if printed | |
-| Peak GPU memory if printed | |
-| Training time wall clock | |
+| Test accuracy | 0.9910 (99.10%) |
+| Cross-entropy eval | 0.0289 |
+| exp cross-entropy | 1.0293 |
+| Peak CPU memory ru_maxrss if printed | 4969104 (Linux field; kilobytes, about 4.85 GB) |
+| Peak GPU memory if printed | PyTorch peak allocated **2352 MB**; NVML total **81920 MB**, used **3929 MB** at sample |
+| Training time wall clock | 454 s (~7.6 min) |
+
+Extra test metrics from the same run: macro F1 **0.9611**, civil-rights (positive class) F1 **0.9269**, precision **0.9217**, recall **0.9322** on **28,611** test rows.
+
+Structured copy of the same numbers: [part2_colab_metrics.json](part2_colab_metrics.json).
 
 ### Optional: local MLX `finetune_mlx.py --fast` Mac run
 

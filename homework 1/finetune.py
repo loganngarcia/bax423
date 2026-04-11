@@ -35,6 +35,7 @@ set_seed(808)
 # Optional: reset peak GPU stats before run
 if torch.cuda.is_available():
     torch.cuda.reset_peak_memory_stats()
+    torch.backends.cudnn.benchmark = True
 
 ds = load_dataset(
     "dell-research-harvard/newswire",
@@ -131,13 +132,19 @@ def compute_metrics(eval_pred):
 
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
+# Colab GPU: larger batch + fp16 speeds training a lot. MLX run showed the task reaches high
+# accuracy; DistilBERT still needs its own run. On CPU or MPS keep smaller batch and no fp16.
+_cuda = torch.cuda.is_available()
+_train_bs = 32 if _cuda else 16
+_eval_bs = 64 if _cuda else 32
+
 out_dir = "./newswire-distilbert-cls"
 training_args = TrainingArguments(
     output_dir=out_dir,
     learning_rate=2e-5,
-    # batch 16 is faster on Apple MPS than 32 for this model; CUDA machines can raise this.
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=32,
+    per_device_train_batch_size=_train_bs,
+    per_device_eval_batch_size=_eval_bs,
+    fp16=bool(_cuda),
     num_train_epochs=4,  # increase if test accuracy stays below 0.93
     weight_decay=0.01,
     warmup_ratio=0.1,
@@ -149,6 +156,7 @@ training_args = TrainingArguments(
     logging_steps=50,
     seed=808,
     report_to="none",
+    dataloader_num_workers=2 if _cuda else 0,
 )
 
 trainer = Trainer(
