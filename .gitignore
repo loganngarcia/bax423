@@ -26,3 +26,6 @@ HF_TOKEN
 
 # Local weight dumps (optional; Hub download preferred)
 homework 1/mlx_bert/weights/*.npz
+
+# Machine-specific training logs (keep locally; do not commit)
+homework 1/part2_mlx_run*.log

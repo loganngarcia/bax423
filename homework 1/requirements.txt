@@ -8,6 +8,7 @@ torch
 numpy
 scikit-learn
 huggingface_hub>=0.20.0
+matplotlib>=3.7.0
 
 # Part 2 fast path on Apple Silicon (optional)
 mlx>=0.28.0
