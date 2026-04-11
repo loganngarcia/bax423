@@ -15,7 +15,9 @@ ENV/
 # OS / IDE (macOS Finder; ignore in every folder)
 .DS_Store
 **/.DS_Store
-.cursor/
+# Cursor — ignore local rules/cache but keep committed MCP templates
+.cursor/*
+!.cursor/mcp.json
 
 # Secrets (never commit)
 .env

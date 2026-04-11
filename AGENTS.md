@@ -9,3 +9,7 @@ Homework folders should be safe to zip for Canvas as-is. That means:
 - Put only deliverables the rubric asks for inside each `homework N/` tree. No meta checklists, scratch notes, or “how to submit” files in that folder. If we need a list, put it here in AGENTS or at repo root, not inside the folder the student will zip.
 - Use `.gitignore` so huge datasets, venvs, checkpoints, secrets, and local junk never land in git and never tempt anyone to upload them by mistake.
 - Keep handout PDFs and repro scripts outside the zip path when they are not graded, or document them in AGENTS only.
+
+## Google Colab MCP
+
+This repo includes `.cursor/mcp.json` with the official [Colab MCP server](https://github.com/googlecolab/colab-mcp) so agents can drive notebooks in the browser. 
