@@ -30,3 +30,7 @@ homework 1/mlx_bert/weights/*.npz
 
 # Machine-specific training logs (keep locally; do not commit)
 homework 1/part2_mlx_run*.log
+
+# HW2 — large CSVs exceed GitHub file size limits; keep local copies in DataFiles/
+homework 2/DataFiles/UNSW-NB15_1.csv
+homework 2/DataFiles/Wednesday-workingHours.pcap_ISCX.csv
