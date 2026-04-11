@@ -1,66 +1,29 @@
-# BAX 423 — Homework 1 · Part 1 — ML Design
+# BAX 423 — Homework 1 — Part 1
 
-**Course:** Big Data (BAX 423)  
-**Due:** April 10, 2026  
+Logan Garcia, Bonnie Hines  
 
----
+## 1. Frontier (closed) model vs open source for a song recommender
 
-### 1. Song recommendation: frontier (closed) model vs open-source
+If you pay for a top vendor model, you’re basically buying speed and fewer headaches: someone else hosts it, patches it, and deals with a lot of the safety and content-policy stuff. For a small team that matters—you’re not babysitting GPUs and giant checkpoints all day. The downside is cost scales with traffic, you’re stuck on their roadmap, and if they change the model your embeddings and offline jobs can all move at once. You also have to be comfortable sending user data out of your stack unless you negotiate something tighter.
 
-**Why you might pick a frontier / proprietary model**
+Open source is the opposite trade. You host it, fine-tune it, and own the behavior end to end. That’s better when you care about cost at scale, weird domain-specific music data, or compliance that says listening history can’t leave your VPC. The catch is you need people who can actually run and update that stack, and you’re on the hook when something breaks or the model ages.
 
-- **Quality and multimodal fit:** Top-tier proprietary models are often stronger at nuanced understanding of lyrics, mood, and context, which can improve relevance when cold-start data is thin.
-- **Managed safety and compliance:** Vendors may offer SLAs, content policies, audit logs, and faster iteration on policy changes—useful if recommendations must avoid certain artists or regions.
-- **Less operational ML burden:** No need to host large weights, manage quantization pipelines, or maintain forks—faster to ship if your team is small.
+## 2. Features from listening history, and what needs to be “streaming” at serve time
 
-**Why you might not**
+Stuff you’d actually build from logs: how often someone plays an artist or genre, recency-weighted play counts, skip vs complete, time-of-day patterns, maybe a short recent sequence of track IDs for “what they’ve been playing this week.” You might also have coarse location or device if the product uses it.
 
-- **Cost and lock-in:** Per-token or per-query pricing scales with usage; switching models later can change embeddings and require full re-indexing.
-- **Privacy and data residency:** Sending user listening history to a third-party API may conflict with policy unless you have strong contracts and minimization.
-- **Reproducibility and research:** Open weights let you fine-tune in-house, audit behavior, and avoid black-box changes from the vendor.
+For a playlist that refreshes once a day or week, most of that can be batch: nightly or hourly jobs that write tables or features to a store, and the app just reads precomputed results. You don’t need those features updating every second.
 
----
+If you’re recommending the next track off what’s playing right now, you care about what’s happening in this session—current track, last few skips or completes, maybe queue—so those pieces need to be available with very low latency. That’s where you end up with real-time or near-real-time pipes. The daily playlist path is heavier offline work and caching; the in-session path is tighter SLAs and more requests per user.
 
-### 2. Spotify-scale features from listening history; streaming at serve time
+## 3. Daily “For you” playlist vs a recommendation for each new track
 
-| Feature (examples) | Training | Serving (daily “For you”) | Serving (track-to-track) |
-|----------------------|----------|---------------------------|---------------------------|
-| **Per-user play counts / recency-weighted counts** per artist, genre, mood bucket | Batch from logs | Mostly **batch** (nightly/hourly aggregates) | Needs **near-real-time** session features (last N plays in-session) |
-| **Sequence embeddings** (e.g., last 500 track IDs → transformer / GRU embedding) | Batch jobs | Refreshed **periodically** + cached user vector | **Streaming** partial updates as user listens |
-| **Co-occurrence / item–item similarity** (matrix factorization, ALS) | Batch | Precomputed; **lookup** at request | Hybrid: precomputed + **small online** adjustment for session |
-| **Demographic / region popularity** | Batch | Batch | Mostly batch; can add light real-time locale context |
-| **Skip rate, completion rate** per (user, track) | Batch | Batch aggregates; for live radio, **streaming** counters matter |
+The batch playlist case is forgiving on latency. You can run bigger models, score more candidates, and ship a list users see hours later. Failures are easier to hide—you retry the job, you don’t block a button press.
 
-Not every feature must be streaming at serve time: playlist-style recommendations can rely on features materialized hourly or daily. Track-to-track “what goes with what I’m playing now” needs low-latency **session** and **context** features (current track, device, time of day).
+Per-track recommendations fire all the time while someone is listening. You need fast inference, a small set of features you can fetch quickly, and usually a simpler model or aggressive caching so you don’t melt the cluster. You also care more about jarring jumps (genre whiplash) because the user notices immediately. So the engineering work shifts from big overnight pipelines to online serving, feature stores, and rate limits—not the same problem as a once-a-day job.
 
----
+## 4. When an artist or subgenre blows up overnight
 
-### 3. “For you” playlist (daily/weekly) vs per-track recommendations
+First you watch the product metrics: clicks, skips, completion, broken out for new tracks and new tags—not just one global accuracy number. If TikTok drives a spike in a sound, your old collaborative model might be stale before the nightly train finishes.
 
-**Batch / playlist-style**
-
-- Latency budgets are relaxed (compute overnight).
-- You can use heavier models, larger candidate pools, and more expensive re-ranking because you precompute and cache a playlist.
-- Exploration can be scheduled (e.g., inject novelty once per day).
-
-**Per-track / in-session**
-
-- **Stricter latency** (often tens to low hundreds of ms).
-- Must emphasize **fresh session signals** (current song, short horizon of recent skips).
-- **Consistency:** rapid flips between unrelated genres may hurt UX—may need smoothing or “momentum” in the policy.
-- **Throughput** is higher (many more inference calls per active listener).
-
-System requirements shift from **offline batch capacity and data pipelines** toward **online feature stores, low-latency retrieval, and robust fallbacks** when real-time signals are missing.
-
----
-
-### 4. Minimizing drift when popularity and subgenres shift suddenly
-
-- **Monitor inputs and outputs:** Track distribution of track attributes, impression/CTR distributions, and slice metrics (new artists, emerging tags). Alert on large PSI/KS shifts.
-- **Freshen labels and feedback loops:** Weight recent interactions higher; use **time-decayed** training or **rolling windows** for collaborative signals.
-- **Cold-start paths:** Separate policies for new artists (content-based audio/text features, similarity to clusters) so spikes don’t collapse recommendations to a few megahits only.
-- **Exploration:** Multi-armed bandits or epsilon-greedy layers so the system keeps probing new content instead of purely exploiting stale co-occurrence.
-- **Periodic retraining and canary evaluation:** Ship candidate models on shadow traffic or small cohorts before full rollout.
-- **Embedding refresh:** Rebuild or partially update item embeddings when catalog composition changes; avoid static artist vectors forever.
-
-Together, these reduce **concept drift** (what “good” means) and **covariate drift** (what users and catalogs look like) without overreacting to single-day noise.
+In practice that means shorter refresh windows for the data you train on, favoring recent listens when you retrain, and having a path for cold items (audio or text features, or “similar to” clusters) so new stuff isn’t invisible. Some teams ship model updates gradually (small % of users first) so you don’t tank everyone at once. Exploration matters too—if the system only exploits old co-occurrence, it never learns the new thing until it’s already huge. Retraining on a schedule only works if someone is actually looking at whether new slices of the catalog are doing okay.
