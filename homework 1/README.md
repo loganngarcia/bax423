@@ -1,29 +1,30 @@
-# BAX 423 — Homework 1
+# Homework 1 — BAX 423
 
-**Course:** BAX 423  
-**Group:** Logan Garcia, Bonnie Hines  
+**Logan Garcia** · **Bonnie Hines**
 
-This folder holds our **Homework 1** submission materials: Part 1 (ML design write-up), Part 2 (Newswire fine-tuning + notebook), Part 3 (attention mechanisms notebook), and Part 4 (NOAA tornado analysis with HTML + PDF report).
-
----
-
-## Layout
-
-| Path | What it is |
-|------|------------|
-| `finetune.py` | **PyTorch + Hugging Face `Trainer`** — DistilBERT, best on **GPU / Colab** |
-| `finetune_mlx.py` | **Apple MLX** path — BERT-base weights from Hugging Face Hub |
-| `BAX423_HW1_Part1_WriteUp.md` | Part 1 answers |
-| `BAX423_HW1_Part2_FineTuning.ipynb` | Part 2 notebook (run after training) |
-| `BAX423_HW1_Part3_AttentionMechanisms.ipynb` | Part 3 notebook |
-| `part4/tornado_analysis.py` | Part 4 pipeline |
-| `part4/output/` | Generated `tornado_report.html` and `tornado_report.pdf` |
-| `requirements.txt` | Python dependencies |
-| `BAX423_HW1_GRADING_CHECKLIST.txt` | Checklist vs. rubric |
+This folder is everything we’re turning in for Homework 1: short written answers, two notebooks, fine-tuning code for the Newswire task, and a small NOAA tornado analysis with HTML and PDF outputs.
 
 ---
 
-## Quick start (local)
+## What each part is
+
+**Part 1 — Design write-up**  
+Answers to the ML design questions in `BAX423_HW1_Part1_WriteUp.md` (export to PDF too if the course asks for it).
+
+**Part 2 — Newswire classification**  
+Fine-tune a transformer on the Harvard Newswire dataset, hit at least **93% test accuracy**, and document choices plus metrics. Starter script: `finetune.py` (DistilBERT, matches the assignment handout). There is also `finetune_mlx.py` for Apple Silicon if you want to train locally with MLX; use Colab + GPU if PyTorch on your Mac is too slow.
+
+Supporting files: `BAX423_HW1_Part2_FineTuning.ipynb`, `BAX423_HW1_Part2_ModelingDiscussion.md`.
+
+**Part 3 — Attention**  
+`BAX423_HW1_Part3_AttentionMechanisms.ipynb` — complete the TODOs, answer the intuition questions, and make sure **every cell has been run** so outputs show when you submit.
+
+**Part 4 — Tornado analysis**  
+`part4/tornado_analysis.py` pulls NOAA tornado data (EF2+, 2020–2025), runs the analyses the handout asks for, and writes `part4/output/tornado_report.html` and `tornado_report.pdf` with **both** of our names on the PDF. There is an email template in `part4/` for Part 4(e); send from a **personal Gmail**, not your school address, with the subject line and wording the assignment specifies.
+
+---
+
+## Setup once
 
 ```bash
 cd "homework 1"
@@ -32,65 +33,51 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Part 2 — PyTorch (DistilBERT, GPU recommended)
+---
 
-```bash
-python finetune.py
-```
+## Commands we actually use
 
-Use **Google Colab** or a CUDA machine if you need speed; on Mac, PyTorch **MPS** can be slow for this workload.
+**Fine-tuning (recommended for speed)**  
+Use **Google Colab with a GPU** and run `finetune.py` there if your laptop is slow.
 
-### Part 2 — MLX (Apple Silicon)
+**Fine-tuning on a Mac (MLX)**  
+From this folder, with the venv active:
 
 ```bash
 python finetune_mlx.py
-# Deadline / slow Mac (~0.3 step/s): ~under 1h wall time
+```
+
+If a full run would take too long, there is a shorter schedule:
+
+```bash
 PYTHONUNBUFFERED=1 python finetune_mlx.py --fast
 ```
 
-Weights load from Hugging Face: [`mlx-community/bert-base-uncased-mlx`](https://huggingface.co/mlx-community/bert-base-uncased-mlx) (`weights.npz`).
+Pretrained MLX weights come from Hugging Face: [`mlx-community/bert-base-uncased-mlx`](https://huggingface.co/mlx-community/bert-base-uncased-mlx).
 
-### Part 4 — Tornado analysis + reports
+**Part 4 reports**
 
 ```bash
 cd part4
 python tornado_analysis.py
 ```
 
-Outputs go to `part4/output/` (HTML + PDF). Group names are set in `tornado_analysis.py`.
+Group / Canvas name can be edited at the top of `tornado_analysis.py` if needed.
 
 ---
 
-## AI tools & prompts (transparency)
+## AI use (course transparency)
 
-Our instructor asked for clarity on how we used AI. Here is what we actually did:
-
-1. **Cursor (coding assistant)**  
-   Used for wiring scripts, debugging `Trainer` API changes (`processing_class` vs. deprecated `tokenizer=`), MLX training loops, ReportLab PDF/HTML for Part 4, and keeping the repo organized for submission.
-
-2. **Hugging Face Hub / “Hugging Face MCP” in Cursor**  
-   We asked the assistant to **find MLX-compatible BERT checkpoints on Hugging Face** so we could avoid a painfully slow **PyTorch + MPS** fine-tune on Mac. The assistant pointed us to **`mlx-community/bert-base-uncased-mlx`**, which matches the vendored `mlx_bert/model.py` layout (`weights.npz`).
-
-3. **Why MLX helped**  
-   In our setup, MPS was profiling around **~1–2 steps/s** for this assignment-style run (on the order of **many hours** for three epochs). MLX on Apple Silicon typically reaches **~5–15+ steps/s** for this pattern on capable hardware; our laptop was slower (**~0.3 step/s**), so we also used **`--fast`** (subset + fewer epochs) when needed. *Exact wall times belong in local `part2_mlx_run*.log` files after a run.*  
-   *Optional sanity check:* a **tiny smoke run** (few steps) can finish in **~2 minutes**; **full rubric training** uses the script defaults and takes longer.
-
-4. **What we did *not* outsource**  
-   Course reasoning in the write-ups, interpreting attention outputs, and the business / policy narrative for Part 1 and Part 4 are our own, edited after drafting help.
+We used **Cursor** to help wire up training scripts, fix library API changes (for example Hugging Face `Trainer` arguments), build the Part 4 HTML/PDF, and keep the repo tidy. We also used **Hugging Face Hub** to pick an MLX-compatible BERT checkpoint (`mlx-community/bert-base-uncased-mlx`) so local training was feasible. Judgment calls in the write-ups, interpretation of attention plots, and the substance of the business-facing answers are ours—we edited anything the tools drafted so it reflects what we actually think.
 
 ---
 
-## Status / what’s left before Canvas
+## Before Canvas
 
-See `BAX423_HW1_GRADING_CHECKLIST.txt`. Typical remaining items:
+Double-check against the official handout and rubric; in short:
 
-- **Part 2:** ~3 min **screen recording** (`.mp4`) — required by rubric.  
-- **Part 2 & 3:** Notebooks **executed end-to-end** with outputs saved.  
-- **Part 2:** Final **test accuracy ≥ 0.93** logged; paste metrics into `BAX423_HW1_Part2_ModelingDiscussion.md` / notebook.  
-- **Part 4(e):** Email from a **non-UMN Gmail** (template in `part4/`).  
+- Part 2: **test accuracy ≥ 0.93**, metrics (including something like perplexity / exp(loss) where asked), and the **short screen recording** (~3 minutes).  
+- Both notebooks: **all cells executed**, outputs visible.  
+- Part 4: **PDF and HTML** with names, plus the **email** from a non-UMN Gmail if that part is required.
 
----
-
-## License / course use
-
-This repo is for **educational submission** in BAX 423. Do not misrepresent authorship; follow your course AI policy.
+A tighter item-by-item list lives in `BAX423_HW1_GRADING_CHECKLIST.txt` if you want a literal checklist.
