@@ -1,0 +1,42 @@
+BAX 423 — Homework 1 — Line-by-line vs PDF + Rubric (Sheet1)
+================================================================
+Group: Logan Garcia, Bonnie Hines  |  Edit GROUP_NAME_CANVAS in part4/tornado_analysis.py if Canvas label differs.
+
+--- CANVAS SUBMISSION LIST (PDF p.1) ---
+[√] Part 1 — Write-up of responses → BAX423_HW1_Part1_WriteUp.md (+ Part1 PDF if you export)
+[√] Part 2 — iPython notebook with ALL cells run → BAX423_HW1_Part2_FineTuning.ipynb (execute after training)
+[√] Part 3 — iPython notebook with ALL cells run → BAX423_HW1_Part3_AttentionMechanisms.ipynb
+[√] Part 4 — Python + HTML → part4/tornado_analysis.py, part4/output/tornado_report.html
+[√] Part 4 — PDF report with names → part4/output/tornado_report.pdf
+[ ] Short video (.mp4) Part 2 — YOU must record (~3 min); not generatable here
+[ ] Part 4(e) Email to Chris — YOU send from throwaway Gmail (template in part4/email_to_chris_template.txt)
+
+--- RUBRIC (HW1 Rubric.xlsx) ---
+Part 1 — 20 pts — All questions answered
+  [√] Four ML design questions addressed in BAX423_HW1_Part1_WriteUp.md
+  Penalty: -2.5 per incorrect/missing answer → proofread before submit
+
+Part 2 — 40 pts — TODOs, runs, ≥93% accuracy, video
+  [√] finetune.py completed (TODOs filled)
+  [ ] Test accuracy ≥ 0.93 — VERIFY after run (finetune.py on GPU/Colab OR finetune_mlx.py on Mac)
+  [√] Modeling discussion — BAX423_HW1_Part2_ModelingDiscussion.md + paste into notebook or Canvas
+  [√] Peak CPU / GPU / perplexity — log from training output (MLX: CPU RSS + exp(mean CE); GPU on Colab)
+  [ ] Video submitted — required (-5 if missing per rubric)
+
+Part 3 — 30 pts — TODOs + executed notebook
+  [√] Attention TODOs implemented in notebook
+  [ ] All cells executed with visible output — run notebook end-to-end before Canvas (-7.5 if not)
+
+Part 4 — 10 pts — Code, HTML, analysis, email
+  [√] NOAA EF2+ 2020–2025 downloaded and analyzed
+  [√] States, monthly freq, per-state peak month, ties rule, regional pattern, deaths, % mobile home/trailer
+  [√] PDF + HTML with group member names (Logan Garcia, Bonnie Hines)
+  [ ] Email sent (-2 if not); analysis correct (-2 if wrong)
+
+--- PDF ASSIGNMENT DETAILS CHECKLIST ---
+Part 1(a–d): design questions — see write-up
+Part 2(a–f): Newswire, finetune.py TODOs, ≥93%, discuss, CPU/GPU/perplexity, notebook + video
+Part 3(a–d): AttentionMechanisms.ipynb TODOs, intuition answers, all outputs visible
+Part 4(a–e): NOAA download, analyses, PDF names, email subject BAX423 Tornado Watch, Avoid [STATES] in May, sign off group name, Gmail not school email
+
+NO CREDIT for missing rubric items (per rubric sheet footnote).

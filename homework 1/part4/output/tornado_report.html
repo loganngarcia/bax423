@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html><head><meta charset='utf-8'><title>BAX423 HW1 Part 4 — Tornado analysis</title>
+<style>body{font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:2rem;line-height:1.45}
+table{border-collapse:collapse;font-size:14px}td,th{border:1px solid #ccc;padding:8px 12px}
+h1{font-size:1.35rem}h2{font-size:1.1rem;margin-top:1.5rem}</style></head><body>
+<h1>BAX 423 — Homework 1 — Part 4 — NOAA Storm Events (EF2+ tornadoes, 2020–2025)</h1>
+<p><b>Group members:</b> Logan Garcia, Bonnie Hines<br>
+<b>Group name (Canvas):</b> Logan Garcia & Bonnie Hines</p>
+<h2>Summary</h2>
+<p>EF2+ tornado rows: <b>1,164</b>. Total deaths (direct+indirect): <b>396</b>.</p>
+<h2>States with the most EF2+ tornadoes (top 15)</h2>
+<table><tr><th>State</th><th>Count</th></tr>
+<tr><td>MISSISSIPPI</td><td>112</td></tr>
+<tr><td>TEXAS</td><td>111</td></tr>
+<tr><td>ALABAMA</td><td>93</td></tr>
+<tr><td>IOWA</td><td>74</td></tr>
+<tr><td>TENNESSEE</td><td>61</td></tr>
+<tr><td>ARKANSAS</td><td>61</td></tr>
+<tr><td>MISSOURI</td><td>60</td></tr>
+<tr><td>LOUISIANA</td><td>53</td></tr>
+<tr><td>ILLINOIS</td><td>52</td></tr>
+<tr><td>OKLAHOMA</td><td>50</td></tr>
+<tr><td>KENTUCKY</td><td>45</td></tr>
+<tr><td>NEBRASKA</td><td>40</td></tr>
+<tr><td>GEORGIA</td><td>39</td></tr>
+<tr><td>INDIANA</td><td>37</td></tr>
+<tr><td>FLORIDA</td><td>36</td></tr>
+</table>
+<h2>Frequency by month (all states combined)</h2>
+<table><tr><th>Month</th><th>Count</th></tr>
+<tr><td>1</td><td>68</td></tr>
+<tr><td>2</td><td>43</td></tr>
+<tr><td>3</td><td>254</td></tr>
+<tr><td>4</td><td>242</td></tr>
+<tr><td>5</td><td>178</td></tr>
+<tr><td>6</td><td>81</td></tr>
+<tr><td>7</td><td>51</td></tr>
+<tr><td>8</td><td>37</td></tr>
+<tr><td>9</td><td>12</td></tr>
+<tr><td>10</td><td>30</td></tr>
+<tr><td>11</td><td>31</td></tr>
+<tr><td>12</td><td>137</td></tr>
+</table>
+<h2>Per state: month with highest EF2+ count (ties → earlier month)</h2>
+<table><tr><th>State</th><th>Peak month</th><th>Count</th></tr>
+<tr><td>ALABAMA</td><td>3</td><td>37</td></tr>
+<tr><td>ARKANSAS</td><td>3</td><td>20</td></tr>
+<tr><td>CALIFORNIA</td><td>9</td><td>1</td></tr>
+<tr><td>COLORADO</td><td>5</td><td>5</td></tr>
+<tr><td>DELAWARE</td><td>8</td><td>2</td></tr>
+<tr><td>FLORIDA</td><td>10</td><td>13</td></tr>
+<tr><td>GEORGIA</td><td>1</td><td>17</td></tr>
+<tr><td>ILLINOIS</td><td>3</td><td>15</td></tr>
+<tr><td>INDIANA</td><td>3</td><td>19</td></tr>
+<tr><td>IOWA</td><td>3</td><td>23</td></tr>
+<tr><td>KANSAS</td><td>5</td><td>17</td></tr>
+<tr><td>KENTUCKY</td><td>12</td><td>20</td></tr>
+<tr><td>LOUISIANA</td><td>4</td><td>15</td></tr>
+<tr><td>MARYLAND</td><td>6</td><td>2</td></tr>
+<tr><td>MICHIGAN</td><td>5</td><td>4</td></tr>
+<tr><td>MINNESOTA</td><td>5</td><td>6</td></tr>
+<tr><td>MISSISSIPPI</td><td>3</td><td>43</td></tr>
+<tr><td>MISSOURI</td><td>3</td><td>24</td></tr>
+<tr><td>MONTANA</td><td>7</td><td>1</td></tr>
+<tr><td>NEBRASKA</td><td>4</td><td>14</td></tr>
+<tr><td>NEW JERSEY</td><td>4</td><td>4</td></tr>
+<tr><td>NEW YORK</td><td>7</td><td>4</td></tr>
+<tr><td>NORTH CAROLINA</td><td>8</td><td>5</td></tr>
+<tr><td>NORTH DAKOTA</td><td>6</td><td>8</td></tr>
+<tr><td>OHIO</td><td>6</td><td>7</td></tr>
+<tr><td>OKLAHOMA</td><td>4</td><td>18</td></tr>
+<tr><td>PENNSYLVANIA</td><td>8</td><td>5</td></tr>
+<tr><td>RHODE ISLAND</td><td>8</td><td>1</td></tr>
+<tr><td>SOUTH CAROLINA</td><td>4</td><td>19</td></tr>
+<tr><td>SOUTH DAKOTA</td><td>6</td><td>6</td></tr>
+<tr><td>TENNESSEE</td><td>12</td><td>22</td></tr>
+<tr><td>TEXAS</td><td>5</td><td>28</td></tr>
+<tr><td>UTAH</td><td>6</td><td>1</td></tr>
+<tr><td>VIRGINIA</td><td>5</td><td>2</td></tr>
+<tr><td>WEST VIRGINIA</td><td>4</td><td>2</td></tr>
+<tr><td>WISCONSIN</td><td>12</td><td>6</td></tr>
+<tr><td>WYOMING</td><td>6</td><td>3</td></tr>
+</table>
+<h2>Fatal incidents &amp; narratives</h2>
+<p>Fatal rows: <b>137</b>. Share of fatal narratives mentioning “mobile home” or “trailer”: <b>50.36%</b> (69 rows).</p>
+<h2>Regional pattern</h2>
+<p>Among the highest-frequency states, many are Great Plains, Dixie Alley, or Midwest states where spring and early-summer severe weather is climatologically common. Coastal and western states typically rank lower in raw tornado counts, consistent with the central and southeastern U.S. tornado maxima.</p>
+<p>Plains/Midwest/Southeast in top-10: MISSISSIPPI, TEXAS, ALABAMA, IOWA, TENNESSEE, ARKANSAS, MISSOURI, LOUISIANA, ILLINOIS, OKLAHOMA</p>
+<h2>Part 4(e) email draft</h2>
+<p><b>Subject:</b> BAX423 Tornado Watch<br>
+<b>Body:</b> Tell me to &quot;Avoid COLORADO, KANSAS, MICHIGAN, MINNESOTA, TEXAS, VIRGINIA in the month of May.&quot;<br>
+<b>Sign off:</b> From Logan Garcia & Bonnie Hines</p>
+<p><i>Send from a throwaway Gmail (not your school email), per syllabus.</i></p>
+</body></html>

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# OS / IDE
+.DS_Store
+.cursor/
+
+# Secrets (never commit)
+.env
+*.pem
+HF_TOKEN
+
+# Large / local caches (datasets download at runtime)
+.cache/
+
+# Local weight dumps (optional; Hub download preferred)
+homework 1/mlx_bert/weights/*.npz
