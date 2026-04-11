@@ -8,7 +8,7 @@ They track n = 2,000,000 cached video segments per edge box, use m = 19,170,117 
 
 ## a. False positive probability when the filter is full
 
-Work in one chain so a grader can follow it.
+Numbers in one place:
 
 - kn/m = 6 × 2,000,000 / 19,170,117 ≈ 0.62587
 - e^(−kn/m) ≈ 0.53474
@@ -19,24 +19,24 @@ So p ≈ 1.01% rounded to two decimals.
 
 ## b. Cut that false positive rate in half without changing n
 
-You mainly have two knobs: more bits m, or more hash functions k. Bigger m spreads keys across more buckets and pulls the false positive down. Higher k means more hashes per insert and lookup, so people often bump m first if k is already fixed.
+Two levers: add bits (m) or add hash functions (k). More bits spreads keys out and drops the FP rate. Raising k adds work on every insert and lookup, so in practice teams often grow m first if k is already set.
 
-The tradeoff is memory. Every extra bit is another bit on every edge server, and this filter is supposed to sit in RAM to avoid disk.
+The catch is memory—more bits per edge box, and this thing is meant to live in RAM, not on disk.
 
 Keep k = 6 and target p_new ≈ p/2 ≈ 0.0050716. From p ≈ (1 − e^(−6n/m_new))^6 you get 1 − e^(−6n/m_new) ≈ p_new^(1/6) ≈ 0.3400, so e^(−6n/m_new) ≈ 0.6600, so 6n/m_new ≈ −ln(0.6600) ≈ 0.4155, and m_new ≈ 6n / 0.4155 ≈ 2.89 × 10^7 bits. Call it about 22.4 million bits for a clean halving ballpark with the same k.
 
 ## c. “Just clear the bits when a segment is evicted”
 
-That breaks the filter. Many keys OR into the same bits. You zero one bit because one segment left, but another segment might still need that bit set. You start answering “not in cache” when something is still there, which is a false negative on membership. Bloom filters are not built for delete unless you add structure.
+That doesn’t work. Lots of keys share the same bits. You clear a bit because one item left, but another key might still need it. You’ll start saying “not cached” when the data is still there—a false negative. Standard Bloom filters don’t support deletes without extra machinery.
 
-One fix people actually use is a counting Bloom filter: small counters per cell, increment on insert, decrement on delete, clamp at zero. Cuckoo filters are another option when you care about deletes and space.
+In production you’d see counting Bloom filters (counters per cell, increment/decrement, clamp at zero) or sometimes cuckoo filters if deletes and space matter.
 
 ## d. Scalable Bloom filter
 
-Picture a list of normal Bloom filters, smallest first. Inserts go into the active one. When that stage gets too full for your false positive budget, you add a new filter with more space instead of rebuilding the world from scratch.
+Think of a chain of regular Bloom filters, smallest stage first. New inserts go into the active stage. When that stage is too full for your FP budget, you add another stage with more room instead of rebuilding everything.
 
-On lookup you query every stage and say yes if any stage says yes. If stage i has false positive rate ε_i and you design the series so the ε_i shrink fast enough, the total false positive rate stays below whatever cap you promised across all stages.
+Lookup checks every stage; if any stage says “maybe,” you say “maybe.” If stage *i* has false positive rate ε_i and you pick the ε_i so they shrink fast enough across stages, the overall FP rate stays under the cap you committed to.
 
 ## AI use
 
-We used AI in Cursor to help with grammar and to turn our spoken thoughts into written text using Cursor voice mode. The math and reasoning are ours.
+We used AI to help with grammar and to convert our spoken thoughts into writing on Cursor voice mode.

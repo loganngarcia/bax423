@@ -4,24 +4,24 @@ Logan Garcia, Bonnie Hines
 
 ## Part 2 Count-Min Sketch and the histogram
 
-When you threshold sketch counts to call something an attack, collisions matter more than the “minimum across rows is unbiased” story from lecture. A skinny table collides a lot, so counts get pushed up. In our setup that usually shows up as false positives, meaning a quiet source can look hot. False negatives can happen, but undercounting every row is not what CMS is famous for, so you sweat width and depth before you trust the histogram as ground truth.
+Once you pick a threshold and treat sketch counts like “this is an attack,” collisions are what bite you—not the fact that the minimum across rows is unbiased in theory. If the table is too narrow, hashes collide a lot and counts get bumped up. In our setup that mostly showed up as false positives: a quiet source can look busy. You can get misses too, but CMS is usually talked about for overcounts, so we’d widen the sketch (more columns / more rows) before we’d treat the histogram as ground truth for decisions.
 
 ## Part 3 LightGBM runs
 
-On this tabular pipeline, LightGBM landed in the same accuracy ballpark as XGBoost, often with less wall time, which matches what you expect on wide one-hot data where histogram splits help. Exact train and infer seconds and accuracy are in `unsw_nb15_lightgbm_measurements.json` next to the notebook.
+On this tabular pipeline, LightGBM ended up roughly in the same accuracy range as XGBoost, often with shorter wall-clock time. That lines up with what you’d expect on wide one-hot features where histogram splits help. Exact train/infer seconds and accuracy are in `unsw_nb15_lightgbm_measurements.json` next to the notebook.
 
-GOSS samples harder examples more often so each boosting round spends gradient work where the loss is moving. You can still pay for sorting and bookkeeping, so speedup is not automatic on every dataset size.
+GOSS samples the harder examples more often each round so gradient work goes where the loss is still moving. There’s still sorting and bookkeeping, so you don’t automatically get a speedup on every dataset size.
 
-EFB is the idea that sparse columns that almost never fire together can be bundled so the tree code touches fewer effective columns per split. That is a training-time win when your feature space is mostly indicators.
+EFB bundles sparse columns that rarely fire together so the tree code can touch fewer effective columns per split. It’s mainly a training-time win when most of your features are indicators.
 
 ## Part 4 Range queries on text
 
-If you built one sketch per fixed 4000-word chunk, an 8000-word window that does not line up on those boundaries stitches together partial chunks. You add more sketch answers, so error adds up differently than one clean 8000-word block.
+If each sketch is for a fixed 4000-word chunk, an 8000-word window that doesn’t line up on those edges is really mixing partial chunks. You sum more sketch answers, so error stacks differently than if you had one sketch built for a single 8000-word block.
 
-If you want a 99% style guarantee on total error, you tighten each sketch, usually with a smaller epsilon per sketch and enough rows, and you stay honest about how many sketches you sum. More segments in the sum usually means you budget epsilon per segment more conservatively.
+If you want something like a 99% style bound on total error, you tighten each sketch—usually smaller epsilon per sketch and enough rows—and you’re clear about how many sketches you’re adding together. More pieces in the sum usually means budgeting epsilon per piece more conservatively.
 
-Dyadic intervals are the usual trick so any range breaks into a handful of power-of-two aligned pieces. You query one sketch per piece and add. That is how you stop forcing every user question to match your original chunk boundaries.
+Dyadic intervals are the usual approach: break the range into a few power-of-two aligned segments, query one sketch per segment, add the results. That way you’re not forcing every user question to match the chunk boundaries you chose when you built the sketches.
 
 ## AI use
 
-We used AI in Cursor to help with grammar and to turn our spoken thoughts into written text using Cursor voice mode. The technical content is ours.
+We used AI to help with grammar and to convert our spoken thoughts into writing on Cursor voice mode.
