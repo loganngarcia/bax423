@@ -1,52 +1,11 @@
-# BAX 423 — Homework 1
+# HW1 submission
 
-**Students:** Logan Garcia, Bonnie Hines  
+Logan Garcia, Bonnie Hines
 
-This directory contains our submission for Homework 1. Below is what each file or folder is for.
+Main stuff to grade: Part 1 writeup (`BAX423_HW1_Part1_WriteUp.md` + pdf), both notebooks (`BAX423_HW1_Part2_FineTuning.ipynb`, `BAX423_HW1_Part3_AttentionMechanisms.ipynb`), `finetune.py`, modeling writeup for part 2 (`BAX423_HW1_Part2_ModelingDiscussion.md`), and part 4 (`part4/tornado_analysis.py` plus `part4/output/` html pdf json). Video for part 2 goes on Canvas separately.
 
----
+Extra: `finetune_mlx.py` and `mlx_bert/` are an optional MLX run on Mac if you want to look; main line is still `finetune.py` on GPU. Assignment pdf and rubric xlsx are in here too for our reference.
 
-## Contents
+If you need to rerun anything: `pip install -r requirements.txt`, then part 2 use Colab for `finetune.py` or locally `python finetune_mlx.py` / `--fast`, part 4 is `cd part4` and `python tornado_analysis.py`. Skip uploading `.venv` if the zip is huge.
 
-| Item | Description |
-|------|-------------|
-| `HW1 (2).pdf` | Assignment prompt (course copy). |
-| `HW1 Rubric.xlsx` | Grading rubric. |
-| `BAX423_HW1_Part1_WriteUp.md` | Part 1 written answers. |
-| `BAX423_HW1_Part1_WriteUp.pdf` | Part 1 export (if required on Canvas). |
-| `finetune.py` | Part 2: DistilBERT fine-tuning with Hugging Face `Trainer` (intended for GPU / Colab). |
-| `finetune_mlx.py` | Part 2 (optional): same task with MLX on Apple Silicon; weights from Hugging Face Hub. |
-| `mlx_bert/` | Helper module used by `finetune_mlx.py`. |
-| `BAX423_HW1_Part2_FineTuning.ipynb` | Part 2 notebook. |
-| `BAX423_HW1_Part2_ModelingDiscussion.md` | Part 2 modeling discussion and results table. |
-| `BAX423_HW1_Part3_AttentionMechanisms.ipynb` | Part 3 notebook. |
-| `part4/tornado_analysis.py` | Part 4 script (NOAA analysis, HTML and PDF output). |
-| `part4/output/` | Generated `tornado_report.html`, `tornado_report.pdf`, and `summary.json`. |
-| `part4/email_template_part4e.txt` | Draft for the Part 4(e) email (personal Gmail only). |
-| `requirements.txt` | Python dependencies. |
-
----
-
-## Environment
-
-```text
-python3 -m venv .venv
-source .venv/bin/activate    # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-Omit the `.venv` folder from your Canvas upload if the zip is too large; graders only need the files above and can reinstall packages from `requirements.txt`.
-
----
-
-## Running the code (short)
-
-- **Part 2 (GPU):** run `finetune.py` in Colab or another machine with CUDA.  
-- **Part 2 (Mac, MLX):** from this directory, `python finetune_mlx.py` or `python finetune_mlx.py --fast` for a shorter local run (see script help).  
-- **Part 4:** `cd part4` then `python tornado_analysis.py`.
-
----
-
-## Course policy on tools
-
-Where the syllabus asks for it, we have documented use of editors, libraries, and assistive software in the course’s required format. Substantive analysis in the write-ups and notebooks is our own.
+AI / tool use is documented wherever the syllabus asked for it; analysis in the writeups is ours.
