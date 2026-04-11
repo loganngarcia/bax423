@@ -1,8 +1,8 @@
 BAX 423 Homework 1 Part 4e
 
-Send from a throwaway Gmail not your university email.
+We send Part 4e with Gmail SMTP (send_part4e_gmail_smtp.py): throwaway Gmail plus Google App Password in env vars, not the browser and not Proton. Do not put the App Password in git.
 
-To: Chris address on the syllabus
+To: cmdemena@ucdavis.edu (Chris, per BAX 423 syllabus)
 Subject: BAX423 Tornado Watch
 
 Body text required by the handout:
@@ -11,4 +11,4 @@ Tell me to avoid [STATES] in the month of May.
 
 Replace STATES with the comma-separated list where May is the peak month for EF2+ counts in your NOAA run. Ties use earliest month. See part4/output/summary.json.
 
-Sign off: From your Canvas group name
+Sign off: From Logan Garcia & Bonnie Hines (match Canvas group name)

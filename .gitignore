@@ -12,8 +12,9 @@ ENV/
 .ipynb_checkpoints/
 *.nbconvert.ipynb
 
-# OS / IDE
+# OS / IDE (macOS Finder; ignore in every folder)
 .DS_Store
+**/.DS_Store
 .cursor/
 
 # Secrets (never commit)

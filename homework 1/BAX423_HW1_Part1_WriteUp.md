@@ -1,29 +1,31 @@
 # BAX 423 Homework 1 Part 1
 
-Logan Garcia, Bonnie Hines  
+Logan Garcia, Bonnie Hines
 
-## 1. Frontier closed model vs open source for a song recommender
+## 1. You're building a song recommendation tool. List why and why not you might want to pick a "frontier model", a proprietary model that is the most advanced, versus an open source model.
 
-Paying for a top vendor model buys speed and fewer headaches. Someone else hosts it and patches it and handles a lot of safety and policy work. A small team does not want to babysit GPUs and giant checkpoints all day. Cost scales with traffic. You are stuck on their roadmap. If they change the model your embeddings and offline jobs can all move at once. You also ship listening data out unless you lock that down in contract.
+Open source is the default because cost and problem size line up. People do not need the most advanced proprietary model just to pick a next song, and after a point you pay more and maintain more without better recommendations. A frontier API on a narrow rec feature often means integration work and vendor churn instead of a clear jump in quality.
 
-Open source flips the trade. You host and fine-tune and you own behavior end to end. That helps when cost at scale matters or when compliance says logs stay in your VPC. You still need people who can run the stack and you own every outage and every stale model.
+A frontier model is reasonable when you need help with compliance, huge scale, or a model you cannot ship in house, or when you want the vendor to run the service. The tradeoffs are usage-based cost, dependence on their roadmap, and possibly sending listening data outside your stack.
 
-## 2. Features from listening history and what must update live at serve time
+If you self-host an open model, data stays in your environment and cost looks like compute plus engineers. You are responsible for training, releases, and incidents. At Spotify scale that trade usually wins until there is a strong reason to pay for a frontier API.
 
-From logs you build things like play counts per artist or genre and recency weighting and skip vs complete and time of day. Maybe a short list of recent track IDs for the last week of listening. Location or device only if the app already uses them.
+## 2. Now assume you're building the model for Spotify and you have access to users' listening histories. What are some features you might want to compute? When you move from training your model to serving will each of these features require streaming data?
 
-A playlist that refreshes once a day or week can stay mostly batch. Nightly or hourly jobs write rows to a store and the app reads precomputed results. Nothing has to update every second.
+You might compute plays by artist or genre, skip rate versus finish rate, time of day and day of week, the last few tracks in the session, a short taste vector from recent plays, and device or region when you collect those fields legitimately.
 
-Recommending the next track from what is playing now is different. You need this session. Current track and recent skips or completes and maybe the queue. Those inputs need very low latency so you end up on real-time or near-real-time paths. Daily playlist work is heavy offline jobs plus cache. In-session work is tight SLAs and more calls per user.
+Training reads scheduled batches built from historical logs, so the training step itself does not need a live streaming pipeline attached.
 
-## 3. Daily For-you style playlist vs a recommendation on every new track
+In serving, slowly changing values such as daily genre counts can land in Cloudflare D1 after you refresh them on a schedule. For the feature reads that users request through the API most often, Cloudflare Cache can return a cached response so those calls stay fast instead of running a full API or origin round trip on every request. Values that describe the current moment, such as the playing track and recent skips in this session, still need to update in near real time while playback is happening, so that part of the feature path looks more like streaming even when the rest reads from Cloudflare. Training still leans on batch data, and production mixes those stored snapshots with inputs that change every few seconds during a session.
 
-Batch playlist work is loose on latency. You can use bigger models and score more items and ship a list people see hours later. If the job fails you retry. You do not block a button.
+## 3. How does the requirements of your system change if you're sending users a list of recommendations that updates once a day/week (a "For you" playlist, essentially) versus if you are recommending a new song related to each song a user is currently listening to?
 
-Per-track recs fire the whole time someone is listening. You need fast inference and a small feature set you can pull quickly and often a smaller model or heavy cache so you do not melt serving. Genre jumps feel bad right away so UX matters more. Engineering shifts toward online serving and feature stores and rate limits instead of only overnight pipelines.
+When the playlist updates once a day or week, you can run a heavier job overnight, cache the full list, and retry failures without stopping playback. Your bottleneck is how many batch runs you complete per day, not how fast each API call returns.
 
-## 4. When an artist or subgenre blows up overnight
+When you recommend on every track during playback, you are on a latency-sensitive path. You need fast responses, small feature lookups, caching, and often a smaller model so the service stays stable. Reliability and rate limits matter more than in the offline playlist case, and you spend more engineering on real-time data paths and low-latency storage.
 
-Watch product metrics first. Clicks and skips and completion split by new tracks and new tags. Not one global accuracy line. A viral spike can leave your old collaborative model wrong before the nightly train lands.
+## 4. Some artists become incredibly popular suddenly. New subgenres can emerge. What can you do to minimize the drift of your model?
 
-So you shorten how old training data can get and you weight recent listens when you retrain. You add a path for cold tracks with audio or text or similarity clusters so new music is not invisible. Many teams roll models out to a slice of users first. You keep some exploration so the system does not only replay old co-occurrence. A retrain schedule only helps if someone checks how new catalog slices are doing.
+Rely on production metrics such as skips, completes, and satisfaction on new and breakout tracks, not only a single offline accuracy number, because those metrics shift earlier than one aggregate score on a dashboard.
+
+You should retrain often enough that training data reflects current taste. When you fit the model, let recent listening count for more than years-old history so the model tracks what people do now. Add fallbacks for cold tracks using metadata, audio, or text so new music is not invisible next to a model that only saw old co-listening patterns. Roll changes to a subset of users first, keep some randomness so new music still gets shown, and review behavior on new catalog after each release instead of trusting the schedule alone.

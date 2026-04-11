@@ -29,6 +29,9 @@ EF_STRONG = {"EF2", "EF3", "EF4", "EF5"}
 GROUP_MEMBERS = "Logan Garcia, Bonnie Hines"
 GROUP_NAME_CANVAS = "Logan Garcia & Bonnie Hines"
 
+# Part 4e recipient (Chris) per course syllabus.
+COURSE_EMAIL_CHRIS = "cmdemena@ucdavis.edu"
+
 
 def fetch_index() -> str:
     with urlopen(BASE, timeout=120) as r:
@@ -216,6 +219,25 @@ def build_pdf_report(
             body,
         )
     )
+    story.append(Spacer(1, 0.15 * inch))
+    story.append(Paragraph("<b>Part 4(e) email draft</b>", h2))
+    story.append(
+        Paragraph(
+            f"<b>To:</b> {COURSE_EMAIL_CHRIS}<br/>"
+            f"<b>Subject:</b> BAX423 Tornado Watch<br/>"
+            f"<b>Body:</b> Tell me to avoid these states in the month of May: "
+            f"{', '.join(may_top_states)}.<br/>"
+            f"<b>Sign off:</b> From {GROUP_NAME_CANVAS}",
+            body,
+        )
+    )
+    story.append(
+        Paragraph(
+            "<i>Send from a throwaway non-university inbox "
+            "(we used Proton Mail; syllabus suggested Gmail).</i>",
+            styles["Normal"],
+        )
+    )
     story.append(Spacer(1, 0.2 * inch))
     story.append(
         Paragraph(
@@ -383,10 +405,11 @@ def main() -> int:
         f"<p>{regional_note}</p>",
         f"<p>Plains Midwest Southeast in top 10: {', '.join(plains_hits) or 'none listed'}</p>",
         "<h2>Part 4(e) email draft</h2>",
+        f"<p><b>To:</b> {COURSE_EMAIL_CHRIS}</p>",
         "<p><b>Subject:</b> BAX423 Tornado Watch<br>",
         f"<b>Body:</b> Tell me to avoid these states in the month of May: {', '.join(may_top_states)}.<br>",
         f"<b>Sign off:</b> From {GROUP_NAME_CANVAS}</p>",
-        "<p><i>Send from a throwaway Gmail not your school email per syllabus.</i></p>",
+        "<p><i>Send from a throwaway non-university inbox (we used Proton Mail; syllabus suggested Gmail).</i></p>",
         "</body></html>",
     ]
 
