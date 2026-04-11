@@ -12,6 +12,7 @@ Options: --fast trains on a random subset with fewer epochs for shorter local ru
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import os
 import sys
@@ -280,19 +281,40 @@ def main() -> None:
         ce = -mx.take_along_axis(log_probs, mx.expand_dims(yb, -1), axis=-1).squeeze(-1)
         ce_sum += float(mx.sum(ce))
     mean_ce = ce_sum / n_test
+    exp_mean_ce = math.exp(mean_ce)
     print(f"mean CE eval: {mean_ce:.4f}")
-    print(f"exp mean CE perplexity-style: {math.exp(mean_ce):.4f}")
+    print(f"exp mean CE perplexity-style: {exp_mean_ce:.4f}")
 
     if acc < 0.93:
         print("Test accuracy is below 0.93; try more epochs, tuning LR, or finetune.py on GPU.")
 
+    peak_rss: int | None = None
     try:
         import resource
 
         ru = resource.getrusage(resource.RUSAGE_SELF)
-        print(f"Peak RSS ru_maxrss: {ru.ru_maxrss}")
+        peak_rss = ru.ru_maxrss
+        print(f"Peak RSS ru_maxrss: {peak_rss}")
     except Exception as e:
         print("Could not read RSS:", e)
+
+    metrics_path = _ROOT / "part2_mlx_metrics.json"
+    metrics_path.write_text(
+        json.dumps(
+            {
+                "mean_ce_eval": round(mean_ce, 6),
+                "exp_mean_ce_perplexity_style": round(exp_mean_ce, 6),
+                "test_accuracy": round(acc, 6),
+                "f1_civil_rights_label_1": round(f1p, 6),
+                "training_wall_seconds": round(wall, 2),
+                "peak_rss_ru_maxrss": peak_rss,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    print(f"Wrote {metrics_path}")
 
 
 if __name__ == "__main__":

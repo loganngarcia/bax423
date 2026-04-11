@@ -12,13 +12,25 @@ For optional local runs on Apple Silicon we have `finetune_mlx.py` with BERT-bas
 
 ## Results
 
-Paste numbers from your GPU run of `finetune.py` and any Mac run of `finetune_mlx.py`.
+Fill the **`finetune.py` Colab GPU** row after that run. Optional MLX numbers are logged in **`BAX423_HW1_Part2_MLX_results.md`** from the completed `--fast` local run.
+
+### Required: `finetune.py` on Colab GPU
 
 | Metric | Value |
 |--------|--------|
 | Test accuracy | |
 | Cross-entropy eval | |
 | exp cross-entropy | |
-| Peak CPU memory ru_maxrss on Mac if used | |
-| Peak GPU memory if used | |
+| Peak CPU memory ru_maxrss if printed | |
+| Peak GPU memory if printed | |
 | Training time wall clock | |
+
+### Optional: local MLX `finetune_mlx.py --fast` Mac run
+
+| Metric | Value |
+|--------|--------|
+| Test accuracy | 0.9686 |
+| Training wall time | 34.7 min |
+| F1 civil rights label 1 | 0.7103 |
+
+Details in **`BAX423_HW1_Part2_MLX_results.md`**. After the next MLX run, **`part2_mlx_metrics.json`** will list mean CE, exp mean CE, and RSS automatically.
