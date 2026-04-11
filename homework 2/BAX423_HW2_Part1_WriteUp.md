@@ -2,41 +2,41 @@
 
 Logan Garcia, Bonnie Hines
 
-## Part 1 setup (StreamEdge)
+## Part 1 setup for StreamEdge
 
-They track n = 2,000,000 cached video segments per edge box, use m = 19,170,117 bits, and k = 6 hash functions. The usual Bloom approximation at capacity is p ≈ (1 − e^(−kn/m))^k.
+They track about two million cached video segments per edge box, use on the order of nineteen million bits of bitmap, and six hash functions. At capacity the usual Bloom filter approximation is that p is roughly one minus e to the negative kn over m, then raise that whole thing to the k.
 
 ## a. False positive probability when the filter is full
 
-Numbers in one place:
+Here is one straight chain of the math so a grader can follow it.
 
-- kn/m = 6 × 2,000,000 / 19,170,117 ≈ 0.62587
-- e^(−kn/m) ≈ 0.53474
-- 1 − e^(−kn/m) ≈ 0.46526
-- p ≈ (0.46526)^6 ≈ 0.010143
+- kn over m equals six times two million over about nineteen point two million, which is about point six two six
+- e to the negative kn over m is about point five three five
+- one minus that is about point four six five
+- p is about point four six five to the sixth, which is about point zero one zero one
 
-So p ≈ 1.01% rounded to two decimals.
+So p is about one percent if you round to two decimal places.
 
 ## b. Cut that false positive rate in half without changing n
 
-Two levers: add bits (m) or add hash functions (k). More bits spreads keys out and drops the FP rate. Raising k adds work on every insert and lookup, so in practice teams often grow m first if k is already set.
+You really have two knobs. Add more bits m, or use more hash functions k. A bigger m spreads keys across more buckets and pulls false positives down. A higher k means more hashes on every insert and lookup, so in practice teams often grow m first if k is already where they want it.
 
-The catch is memory—more bits per edge box, and this thing is meant to live in RAM, not on disk.
+The tradeoff is memory. Every extra bit is another bit on every edge box, and this structure is meant to live in RAM so you are not hitting disk for membership checks.
 
-Keep k = 6 and target p_new ≈ p/2 ≈ 0.0050716. From p ≈ (1 − e^(−6n/m_new))^6 you get 1 − e^(−6n/m_new) ≈ p_new^(1/6) ≈ 0.3400, so e^(−6n/m_new) ≈ 0.6600, so 6n/m_new ≈ −ln(0.6600) ≈ 0.4155, and m_new ≈ 6n / 0.4155 ≈ 2.89 × 10^7 bits. Call it about 22.4 million bits for a clean halving ballpark with the same k.
+Keep k at six and aim for a new p that is about half of the old one, so near point zero zero five. From p roughly equal to one minus e to the negative six n over m new, to the sixth, you work backward to one minus e to the negative six n over m new near point three four, then e to the negative six n over m new near point six six, then six n over m new near point four one six, and m new lands near thirty million bits for a halving ballpark with the same k.
 
-## c. “Just clear the bits when a segment is evicted”
+## c. Just clear the bits when a segment gets evicted
 
-That doesn’t work. Lots of keys share the same bits. You clear a bit because one item left, but another key might still need it. You’ll start saying “not cached” when the data is still there—a false negative. Standard Bloom filters don’t support deletes without extra machinery.
+That idea breaks the filter. Lots of keys OR into the same bits. You clear one bit because one segment left, but another segment might still need that bit set. You start saying not in cache when the item is still there, which is a false negative on membership. Plain Bloom filters are not built for delete unless you add structure.
 
-In production you’d see counting Bloom filters (counters per cell, increment/decrement, clamp at zero) or sometimes cuckoo filters if deletes and space matter.
+A fix people ship in the real world is a counting Bloom filter, small counters per cell, bump on insert, drop on delete, clamp at zero. Cuckoo filters are another path when deletes and space both matter.
 
 ## d. Scalable Bloom filter
 
-Think of a chain of regular Bloom filters, smallest stage first. New inserts go into the active stage. When that stage is too full for your FP budget, you add another stage with more room instead of rebuilding everything.
+Think of a list of normal Bloom filters, smallest stage first. Inserts go into the active stage. When that stage gets too full for your false positive budget, you add a new filter with more space instead of rebuilding everything from scratch.
 
-Lookup checks every stage; if any stage says “maybe,” you say “maybe.” If stage *i* has false positive rate ε_i and you pick the ε_i so they shrink fast enough across stages, the overall FP rate stays under the cap you committed to.
+On lookup you ask every stage and say yes if any stage says yes. If stage i has its own false positive rate and you design the series so those rates shrink fast enough, the overall false positive rate stays under the cap you promised across all stages.
 
 ## AI use
 
-We used AI to help with grammar and to convert our spoken thoughts into writing on Cursor voice mode.
+We used AI to help with grammar and to turn our spoken thoughts into writing in Cursor voice mode. The math and reasoning are ours.
