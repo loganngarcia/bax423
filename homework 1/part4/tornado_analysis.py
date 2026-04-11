@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-BAX 423 Homework 1 — Part 4 — NOAA Storm Events database.
+BAX 423 Homework 1 Part 4. NOAA Storm Events database.
 
-EF2+ tornadoes, 2020–2025: download NCEI Storm Events detail CSVs, filter and analyze,
-write summary.json, tornado_report.html, and tornado_report.pdf (group names on the PDF).
+EF2+ tornadoes 2020 through 2025. Download NCEI Storm Events detail CSVs, filter and analyze,
+write summary.json, tornado_report.html, and tornado_report.pdf with group names on the PDF.
 
-Peak month per state uses tie-break: if two months tie, use the earlier month (smallest number).
+Peak month per state: if two months tie, use the earlier month, smallest month number.
 """
 
 from __future__ import annotations
@@ -20,12 +20,12 @@ from urllib.request import urlopen
 import pandas as pd
 
 BASE = "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/"
-YEARS = list(range(2020, 2026))  # 2020–2025 inclusive
+YEARS = list(range(2020, 2026))  # 2020 through 2025 inclusive
 
 OUT_DIR = Path(__file__).resolve().parent / "output"
 EF_STRONG = {"EF2", "EF3", "EF4", "EF5"}
 
-# Names as they should appear on the PDF/HTML cover (match Canvas if required).
+# Names on the PDF and HTML cover. Match Canvas if your section requires it.
 GROUP_MEMBERS = "Logan Garcia, Bonnie Hines"
 GROUP_NAME_CANVAS = "Logan Garcia & Bonnie Hines"
 
@@ -114,18 +114,18 @@ def build_pdf_report(
     )
     story = []
 
-    story.append(Paragraph("BAX 423 — Homework 1 — Part 4", title_style))
-    story.append(Paragraph("NOAA Storm Events: EF2+ Tornadoes (2020–2025)", styles["Heading2"]))
+    story.append(Paragraph("BAX 423 Homework 1 Part 4", title_style))
+    story.append(Paragraph("NOAA Storm Events: EF2+ Tornadoes 2020-2025", styles["Heading2"]))
     story.append(Spacer(1, 0.15 * inch))
     story.append(Paragraph(f"<b>Group members:</b> {GROUP_MEMBERS}", body))
-    story.append(Paragraph(f"<b>Group name (Canvas):</b> {GROUP_NAME_CANVAS}", body))
+    story.append(Paragraph(f"<b>Canvas group name:</b> {GROUP_NAME_CANVAS}", body))
     story.append(Spacer(1, 0.2 * inch))
     story.append(
         Paragraph(
-            "Data source: NCEI Storm Events Database (detail CSV files). "
-            "Filter: EVENT_TYPE = Tornado, TOR_F_SCALE in EF2–EF5 (plus rare legacy F2–F5). "
+            "Data source: NCEI Storm Events Database detail CSV files. "
+            "Filter: EVENT_TYPE Tornado, TOR_F_SCALE in EF2 through EF5 plus rare legacy F2 through F5. "
             f"Tie-break for peak month per state: smallest month number if tied. "
-            f"Years: {min(YEARS)}–{max(YEARS)}.",
+            f"Years {min(YEARS)} through {max(YEARS)}.",
             body,
         )
     )
@@ -134,13 +134,13 @@ def build_pdf_report(
     story.append(Paragraph("<b>Summary counts</b>", h2))
     tbl_data = [
         ["Metric", "Value"],
-        ["All-event rows loaded (all types, all years)", f"{all_df_rows:,}"],
-        ["EF2+ tornado rows (analysis set)", f"{len(strong):,}"],
-        ["Total deaths (DEATHS_DIRECT + DEATHS_INDIRECT)", f"{strong['deaths_total'].sum():.0f}"],
-        ["Fatal incident rows (deaths &gt; 0)", str(fatal_n)],
+        ["All-event rows loaded all types all years", f"{all_df_rows:,}"],
+        ["EF2+ tornado rows analysis set", f"{len(strong):,}"],
+        ["Total deaths DEATHS_DIRECT plus DEATHS_INDIRECT", f"{strong['deaths_total'].sum():.0f}"],
+        ["Fatal incident rows with deaths greater than zero", str(fatal_n)],
         [
-            '% of fatal narratives mentioning "mobile home" or "trailer"',
-            f"{pct_mention:.2f}% ({int(mh_hits)} rows)",
+            "Percent of fatal narratives mentioning mobile home or trailer",
+            f"{pct_mention:.2f}%  rows {int(mh_hits)}",
         ],
     ]
     t = Table(tbl_data, colWidths=[3.6 * inch, 2.4 * inch])
@@ -159,7 +159,7 @@ def build_pdf_report(
     story.append(t)
     story.append(Spacer(1, 0.2 * inch))
 
-    story.append(Paragraph("<b>States with the most EF2+ tornadoes (top 15)</b>", h2))
+    story.append(Paragraph("<b>States with the most EF2+ tornadoes top 15</b>", h2))
     top15 = [["State", "Count"]] + [
         [st, str(int(c))] for st, c in state_counts.head(15).items()
     ]
@@ -178,7 +178,7 @@ def build_pdf_report(
     story.append(t2)
     story.append(Spacer(1, 0.15 * inch))
 
-    story.append(Paragraph("<b>Frequency by month (all states combined)</b>", h2))
+    story.append(Paragraph("<b>Frequency by month all states combined</b>", h2))
     mo_tbl = [["Month", "Count"]] + [
         [str(m), str(int(month_counts.get(m, 0)))] for m in range(1, 13)
     ]
@@ -200,8 +200,8 @@ def build_pdf_report(
     story.append(Paragraph("<b>States where May is the peak month for EF2+ counts</b>", h2))
     story.append(
         Paragraph(
-            "These are the states where, for that state alone, May had the highest count "
-            "(ties → earliest month). Use this list for the course email (Part 4e).",
+            "States where for that state alone May had the highest count. "
+            "Ties use earliest month. Use this list for the course email part 4e.",
             body,
         )
     )
@@ -212,14 +212,14 @@ def build_pdf_report(
     story.append(Paragraph(regional_note, body))
     story.append(
         Paragraph(
-            f"Examples of Plains/Midwest/Southeast among top-10 states: {', '.join(plains_hits) or 'N/A'}.",
+            f"Examples Plains Midwest Southeast among top 10 states: {', '.join(plains_hits) or 'N/A'}.",
             body,
         )
     )
     story.append(Spacer(1, 0.2 * inch))
     story.append(
         Paragraph(
-            "<i>Generated for BAX 423 HW1. NOAA data are public domain (NCEI).</i>",
+            "<i>Generated for BAX 423 HW1. NOAA data are public domain NCEI.</i>",
             styles["Normal"],
         )
     )
@@ -230,12 +230,12 @@ def build_pdf_report(
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Fetching NOAA directory index…")
+    print("Fetching NOAA directory index...")
     html = fetch_index()
 
     frames: list[pd.DataFrame] = []
     for y in YEARS:
-        print(f"Loading {y} …")
+        print(f"Loading {y} ...")
         df = load_storm_details(y, html)
         frames.append(df)
 
@@ -337,16 +337,16 @@ def main() -> int:
 
     html_lines = [
         "<!DOCTYPE html>",
-        "<html><head><meta charset='utf-8'><title>BAX423 HW1 Part 4 — Tornado analysis</title>",
+        "<html><head><meta charset='utf-8'><title>BAX423 HW1 Part 4 Tornado analysis</title>",
         "<style>body{font-family:system-ui,Segoe UI,sans-serif;max-width:880px;margin:2rem;line-height:1.45}",
         "table{border-collapse:collapse;font-size:14px}td,th{border:1px solid #ccc;padding:8px 12px}",
         "h1{font-size:1.35rem}h2{font-size:1.1rem;margin-top:1.5rem}</style></head><body>",
-        "<h1>BAX 423 — Homework 1 — Part 4 — NOAA Storm Events (EF2+ tornadoes, 2020–2025)</h1>",
+        "<h1>BAX 423 Homework 1 Part 4 NOAA Storm Events EF2+ tornadoes 2020-2025</h1>",
         f"<p><b>Group members:</b> {GROUP_MEMBERS}<br>",
-        f"<b>Group name (Canvas):</b> {GROUP_NAME_CANVAS}</p>",
+        f"<b>Canvas group name:</b> {GROUP_NAME_CANVAS}</p>",
         "<h2>Summary</h2>",
-        f"<p>EF2+ tornado rows: <b>{len(strong):,}</b>. Total deaths (direct+indirect): <b>{strong['deaths_total'].sum():.0f}</b>.</p>",
-        "<h2>States with the most EF2+ tornadoes (top 15)</h2>",
+        f"<p>EF2+ tornado rows: <b>{len(strong):,}</b>. Total deaths direct plus indirect: <b>{strong['deaths_total'].sum():.0f}</b>.</p>",
+        "<h2>States with the most EF2+ tornadoes top 15</h2>",
         "<table><tr><th>State</th><th>Count</th></tr>",
     ]
     for st, c in state_counts.head(15).items():
@@ -354,7 +354,7 @@ def main() -> int:
     html_lines.append("</table>")
 
     html_lines += [
-        "<h2>Frequency by month (all states combined)</h2>",
+        "<h2>Frequency by month all states combined</h2>",
         "<table><tr><th>Month</th><th>Count</th></tr>",
     ]
     for m in range(1, 13):
@@ -364,7 +364,7 @@ def main() -> int:
     html_lines.append("</table>")
 
     html_lines += [
-        "<h2>Per state: month with highest EF2+ count (ties → earlier month)</h2>",
+        "<h2>Per state month with highest EF2+ count ties use earlier month</h2>",
         "<table><tr><th>State</th><th>Peak month</th><th>Count</th></tr>",
     ]
     for st in sorted(per_state_best.keys()):
@@ -377,16 +377,16 @@ def main() -> int:
     html_lines += [
         "<h2>Fatal incidents &amp; narratives</h2>",
         f"<p>Fatal rows: <b>{fatal_n}</b>. "
-        f"Share of fatal narratives mentioning “mobile home” or “trailer”: <b>{pct_mention:.2f}%</b> "
-        f"({int(mh_hits)} rows).</p>",
+        f"Share of fatal narratives mentioning mobile home or trailer: <b>{pct_mention:.2f}%</b> "
+        f"rows {int(mh_hits)}.</p>",
         "<h2>Regional pattern</h2>",
         f"<p>{regional_note}</p>",
-        f"<p>Plains/Midwest/Southeast in top-10: {', '.join(plains_hits) or '—'}</p>",
+        f"<p>Plains Midwest Southeast in top 10: {', '.join(plains_hits) or 'none listed'}</p>",
         "<h2>Part 4(e) email draft</h2>",
         "<p><b>Subject:</b> BAX423 Tornado Watch<br>",
-        f"<b>Body:</b> Tell me to &quot;Avoid {', '.join(may_top_states)} in the month of May.&quot;<br>",
+        f"<b>Body:</b> Tell me to avoid these states in the month of May: {', '.join(may_top_states)}.<br>",
         f"<b>Sign off:</b> From {GROUP_NAME_CANVAS}</p>",
-        "<p><i>Send from a throwaway Gmail (not your school email), per syllabus.</i></p>",
+        "<p><i>Send from a throwaway Gmail not your school email per syllabus.</i></p>",
         "</body></html>",
     ]
 

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-BAX 423 HW1 — Part 2 — Newswire civil-rights classification (DistilBERT).
+BAX 423 HW1 Part 2. Newswire civil-rights classification with DistilBERT.
 
 Run in Colab or a GPU machine:
   pip install transformers datasets evaluate accelerate scikit-learn
-Optional (resource logging): pip install psutil pynvml
+Optional resource logging: pip install psutil pynvml
 
-Peak CPU/GPU usage is printed after training when CUDA + pynvml are available.
+Peak CPU and GPU usage print after training when CUDA and pynvml are available.
 """
 
 ## UNCOMMENT IN COLAB TO INSTALL PACKAGES
@@ -109,7 +109,7 @@ def compute_metrics(eval_pred):
     out["f1_macro"] = f1.compute(
         predictions=predictions, references=labels, average="macro"
     )["f1"]
-    # Positive class = civil rights article (label 1) — important under imbalance
+    # Positive class is civil rights article label 1. Important under imbalance.
     out["f1_civil_rights"] = f1.compute(
         predictions=predictions,
         references=labels,
@@ -164,33 +164,34 @@ trainer = Trainer(
 t0 = time.perf_counter()
 trainer.train()
 train_seconds = time.perf_counter() - t0
-print(f"Training wall time (s): {train_seconds:.1f}")
+print(f"Training wall time seconds: {train_seconds:.1f}")
 
 ftmetrics = trainer.evaluate(tokenized["test"])
 print("Test metrics:", ftmetrics)
 
-# "Perplexity" analog: exp(cross-entropy loss) — same transform as in LM literature;
-# for classification it is not an interpretable "perplexity" but satisfies the rubric ask for a scalar.
+# Perplexity-style scalar: exp of cross-entropy loss, same math step as in LM training logs.
+# For classification it is not a true perplexity but matches the rubric ask for one number.
 eval_loss = ftmetrics.get("eval_loss", float("nan"))
 if eval_loss == eval_loss:
-    print(f"eval_loss (cross-entropy): {eval_loss:.4f}")
-    print(f"exp(eval_loss) (loss-scale perplexity analog): {np.exp(eval_loss):.4f}")
+    print(f"eval_loss cross-entropy: {eval_loss:.4f}")
+    print(f"exp eval_loss perplexity-style scalar: {np.exp(eval_loss):.4f}")
 
-# Peak resource usage (best effort)
+# Peak resource usage best effort
 try:
     import resource
 
     ru = resource.getrusage(resource.RUSAGE_SELF)
-    # macOS: ru_maxrss is bytes; Linux: kilobytes — report both interpretations if huge
+    # macOS ru_maxrss is bytes. Linux often kilobytes. Units vary by OS.
     maxrss = ru.ru_maxrss
-    print(f"Peak RSS (OS-reported ru_maxrss): {maxrss}")
+    print(f"Peak RSS ru_maxrss field: {maxrss}")
 except Exception as e:
     print("Could not read CPU peak RSS:", e)
 
 if torch.cuda.is_available():
+    mb = 1024**2
     print(
-        "Peak GPU allocated (MB):",
-        torch.cuda.max_memory_allocated() / (1024**2),
+        "Peak GPU allocated MB:",
+        torch.cuda.max_memory_allocated() / mb,
     )
     try:
         import pynvml
@@ -198,7 +199,7 @@ if torch.cuda.is_available():
         pynvml.nvmlInit()
         h = pynvml.nvmlDeviceGetHandleByIndex(0)
         mem = pynvml.nvmlDeviceGetMemoryInfo(h)
-        print("GPU total / used (MB):", mem.total / 1024**2, mem.used / 1024**2)
+        print("GPU total and used MB:", mem.total / mb, mem.used / mb)
     except Exception:
         pass
 
@@ -209,4 +210,4 @@ preds_output = trainer.predict(tokenized["test"])
 y_true = preds_output.label_ids
 y_pred = np.argmax(preds_output.predictions, axis=-1)
 print("\nClassification report:\n", classification_report(y_true, y_pred, digits=4))
-print("Confusion matrix [rows=true 0,1]:\n", confusion_matrix(y_true, y_pred))
+print("Confusion matrix rows are true labels 0 then 1:\n", confusion_matrix(y_true, y_pred))

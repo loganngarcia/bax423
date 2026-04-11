@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-BAX 423 Homework 1 — Part 2 — Newswire classification (optional MLX path).
+BAX 423 Homework 1 Part 2. Newswire classification optional MLX path.
 
-Fine-tunes BERT-base with Apple MLX for machines without CUDA. Pretrained weights are loaded from
-Hugging Face: mlx-community/bert-base-uncased-mlx (weights.npz). The course handout uses
-DistilBERT in finetune.py; use that script on Colab/GPU for an exact match to the starter.
+Fine-tunes BERT-base with Apple MLX for machines without CUDA. Pretrained weights load from
+Hugging Face mlx-community bert-base-uncased-mlx weights.npz file. The course handout uses
+DistilBERT in finetune.py. Use that script on Colab or GPU for an exact match to the starter.
 
-Options:  --fast   train on a random subset with fewer epochs for shorter local runs.
+Options: --fast trains on a random subset with fewer epochs for shorter local runs.
 """
 
 from __future__ import annotations
@@ -64,7 +64,7 @@ class BertForSequenceClassificationMLX(nn.Module):
 
 
 def resolve_mlx_weights_npz() -> str:
-    """Download `weights.npz` from Hugging Face Hub (preferred) or build via mlx_bert/convert.py."""
+    """Download weights.npz from Hugging Face Hub preferred, or build via mlx_bert convert.py."""
     fallback = _ROOT / "mlx_bert" / "weights" / "bert-base-uncased.npz"
     if fallback.exists():
         return str(fallback)
@@ -76,7 +76,7 @@ def resolve_mlx_weights_npz() -> str:
         print(f"Using MLX BERT weights from Hugging Face Hub: {HF_MLX_REPO} → {path}")
         return path
     except Exception as e:
-        print(f"Hub download failed ({e}); falling back to local PyTorch→npz conversion…")
+        print(f"Hub download failed: {e}. Falling back to local PyTorch to npz conversion.")
         fallback.parent.mkdir(parents=True, exist_ok=True)
         import subprocess
 
@@ -95,15 +95,15 @@ def resolve_mlx_weights_npz() -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="MLX BERT fine-tune — BAX 423 HW1 Part 2 (optional)")
+    p = argparse.ArgumentParser(description="MLX BERT fine-tune BAX 423 HW1 Part 2 optional")
     p.add_argument(
         "--fast",
         action="store_true",
-        help="Train on a random subset of rows and fewer epochs (faster on laptop).",
+        help="Train on a random subset of rows and fewer epochs. Faster on laptop.",
     )
-    p.add_argument("--max-train-examples", type=int, default=None, help="Cap training rows (after split).")
+    p.add_argument("--max-train-examples", type=int, default=None, help="Cap training rows after split.")
     p.add_argument("--epochs", type=int, default=None, help="Override epoch count.")
-    p.add_argument("--lr", type=float, default=None, help="Learning rate (default: 2e-5, or 3e-5 with --fast).")
+    p.add_argument("--lr", type=float, default=None, help="Learning rate. Default 2e-5 or 3e-5 with --fast.")
     return p.parse_args()
 
 
@@ -180,7 +180,7 @@ def main() -> None:
         train_mask = train_mask[sub]
         train_y = train_y[sub]
         print(
-            f"Training on {max_train_examples:,} of {n_full:,} training examples (subset).",
+            f"Training on {max_train_examples:,} of {n_full:,} training examples subset.",
             flush=True,
         )
 
@@ -241,12 +241,12 @@ def main() -> None:
                 )
 
         print(
-            f"Epoch {epoch + 1}/{epochs} — mean batch loss: {ep_loss / max(1, nb):.4f}",
+            f"Epoch {epoch + 1}/{epochs} mean batch loss: {ep_loss / max(1, nb):.4f}",
             flush=True,
         )
 
     wall = time.perf_counter() - t0
-    print(f"\nTraining wall time: {wall/60:.1f} min ({wall:.0f} s)")
+    print(f"\nTraining wall time minutes: {wall/60:.1f}. Total seconds: {wall:.0f}.")
 
     # Evaluation
     model.eval()
@@ -265,7 +265,7 @@ def main() -> None:
 
     acc = accuracy_score(test_y, all_preds)
     f1p = f1_score(test_y, all_preds, pos_label=1, average="binary")
-    print(f"\nTest accuracy: {acc:.4f}  |  F1 (label=1): {f1p:.4f}")
+    print(f"\nTest accuracy: {acc:.4f}  F1 label 1: {f1p:.4f}")
     print(classification_report(test_y, all_preds, digits=4))
 
     # Perplexity-style scalar from mean CE (same trick as PyTorch script)
@@ -280,8 +280,8 @@ def main() -> None:
         ce = -mx.take_along_axis(log_probs, mx.expand_dims(yb, -1), axis=-1).squeeze(-1)
         ce_sum += float(mx.sum(ce))
     mean_ce = ce_sum / n_test
-    print(f"mean CE (eval): {mean_ce:.4f}")
-    print(f"exp(mean CE) (perplexity-style): {math.exp(mean_ce):.4f}")
+    print(f"mean CE eval: {mean_ce:.4f}")
+    print(f"exp mean CE perplexity-style: {math.exp(mean_ce):.4f}")
 
     if acc < 0.93:
         print("Test accuracy is below 0.93; try more epochs, tuning LR, or finetune.py on GPU.")
@@ -290,7 +290,7 @@ def main() -> None:
         import resource
 
         ru = resource.getrusage(resource.RUSAGE_SELF)
-        print(f"Peak RSS (ru_maxrss): {ru.ru_maxrss}")
+        print(f"Peak RSS ru_maxrss: {ru.ru_maxrss}")
     except Exception as e:
         print("Could not read RSS:", e)
 

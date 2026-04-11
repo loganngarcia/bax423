@@ -1,14 +1,14 @@
-BAX 423 — Homework 1 — Part 4(e)
+BAX 423 Homework 1 Part 4e
 
-Send from a throwaway Gmail (one per group), not your school email.
+Send from a throwaway Gmail not your university email.
 
-To: Chris (address on the syllabus)
+To: Chris address on the syllabus
 Subject: BAX423 Tornado Watch
 
-Body (use the exact sentence structure from the handout):
+Body text required by the handout:
 
-Tell me to "Avoid [STATES] in the month of May."
+Tell me to avoid [STATES] in the month of May.
 
-Replace [STATES] with the comma-separated list of states where May has the highest EF2+ tornado count for that state in our analysis (ties broken by earliest month — see part4/output/summary.json).
+Replace STATES with the comma-separated list where May is the peak month for EF2+ counts in your NOAA run. Ties use earliest month. See part4/output/summary.json.
 
-Sign off with: From [YOUR GROUP NAME AS ON CANVAS]
+Sign off: From your Canvas group name

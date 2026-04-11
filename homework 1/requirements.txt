@@ -1,4 +1,4 @@
-# BAX 423 HW1 — typical local / Colab installs
+# BAX 423 HW1 typical local and Colab installs
 transformers>=4.36.0
 datasets>=2.16.0
 evaluate>=0.4.0
