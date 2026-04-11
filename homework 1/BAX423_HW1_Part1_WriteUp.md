@@ -1,29 +1,29 @@
-# BAX 423 — Homework 1 — Part 1
+# BAX 423 Homework 1 Part 1
 
 Logan Garcia, Bonnie Hines  
 
-## 1. Frontier (closed) model vs open source for a song recommender
+## 1. Frontier closed model vs open source for a song recommender
 
-If you pay for a top vendor model, you’re basically buying speed and fewer headaches: someone else hosts it, patches it, and deals with a lot of the safety and content-policy stuff. For a small team that matters—you’re not babysitting GPUs and giant checkpoints all day. The downside is cost scales with traffic, you’re stuck on their roadmap, and if they change the model your embeddings and offline jobs can all move at once. You also have to be comfortable sending user data out of your stack unless you negotiate something tighter.
+Paying for a top vendor model buys speed and fewer headaches. Someone else hosts it and patches it and handles a lot of safety and policy work. A small team does not want to babysit GPUs and giant checkpoints all day. Cost scales with traffic. You are stuck on their roadmap. If they change the model your embeddings and offline jobs can all move at once. You also ship listening data out unless you lock that down in contract.
 
-Open source is the opposite trade. You host it, fine-tune it, and own the behavior end to end. That’s better when you care about cost at scale, weird domain-specific music data, or compliance that says listening history can’t leave your VPC. The catch is you need people who can actually run and update that stack, and you’re on the hook when something breaks or the model ages.
+Open source flips the trade. You host and fine-tune and you own behavior end to end. That helps when cost at scale matters or when compliance says logs stay in your VPC. You still need people who can run the stack and you own every outage and every stale model.
 
-## 2. Features from listening history, and what needs to be “streaming” at serve time
+## 2. Features from listening history and what must update live at serve time
 
-Stuff you’d actually build from logs: how often someone plays an artist or genre, recency-weighted play counts, skip vs complete, time-of-day patterns, maybe a short recent sequence of track IDs for “what they’ve been playing this week.” You might also have coarse location or device if the product uses it.
+From logs you build things like play counts per artist or genre and recency weighting and skip vs complete and time of day. Maybe a short list of recent track IDs for the last week of listening. Location or device only if the app already uses them.
 
-For a playlist that refreshes once a day or week, most of that can be batch: nightly or hourly jobs that write tables or features to a store, and the app just reads precomputed results. You don’t need those features updating every second.
+A playlist that refreshes once a day or week can stay mostly batch. Nightly or hourly jobs write rows to a store and the app reads precomputed results. Nothing has to update every second.
 
-If you’re recommending the next track off what’s playing right now, you care about what’s happening in this session—current track, last few skips or completes, maybe queue—so those pieces need to be available with very low latency. That’s where you end up with real-time or near-real-time pipes. The daily playlist path is heavier offline work and caching; the in-session path is tighter SLAs and more requests per user.
+Recommending the next track from what is playing now is different. You need this session. Current track and recent skips or completes and maybe the queue. Those inputs need very low latency so you end up on real-time or near-real-time paths. Daily playlist work is heavy offline jobs plus cache. In-session work is tight SLAs and more calls per user.
 
-## 3. Daily “For you” playlist vs a recommendation for each new track
+## 3. Daily For-you style playlist vs a recommendation on every new track
 
-The batch playlist case is forgiving on latency. You can run bigger models, score more candidates, and ship a list users see hours later. Failures are easier to hide—you retry the job, you don’t block a button press.
+Batch playlist work is loose on latency. You can use bigger models and score more items and ship a list people see hours later. If the job fails you retry. You do not block a button.
 
-Per-track recommendations fire all the time while someone is listening. You need fast inference, a small set of features you can fetch quickly, and usually a simpler model or aggressive caching so you don’t melt the cluster. You also care more about jarring jumps (genre whiplash) because the user notices immediately. So the engineering work shifts from big overnight pipelines to online serving, feature stores, and rate limits—not the same problem as a once-a-day job.
+Per-track recs fire the whole time someone is listening. You need fast inference and a small feature set you can pull quickly and often a smaller model or heavy cache so you do not melt serving. Genre jumps feel bad right away so UX matters more. Engineering shifts toward online serving and feature stores and rate limits instead of only overnight pipelines.
 
 ## 4. When an artist or subgenre blows up overnight
 
-First you watch the product metrics: clicks, skips, completion, broken out for new tracks and new tags—not just one global accuracy number. If TikTok drives a spike in a sound, your old collaborative model might be stale before the nightly train finishes.
+Watch product metrics first. Clicks and skips and completion split by new tracks and new tags. Not one global accuracy line. A viral spike can leave your old collaborative model wrong before the nightly train lands.
 
-In practice that means shorter refresh windows for the data you train on, favoring recent listens when you retrain, and having a path for cold items (audio or text features, or “similar to” clusters) so new stuff isn’t invisible. Some teams ship model updates gradually (small % of users first) so you don’t tank everyone at once. Exploration matters too—if the system only exploits old co-occurrence, it never learns the new thing until it’s already huge. Retraining on a schedule only works if someone is actually looking at whether new slices of the catalog are doing okay.
+So you shorten how old training data can get and you weight recent listens when you retrain. You add a path for cold tracks with audio or text or similarity clusters so new music is not invisible. Many teams roll models out to a slice of users first. You keep some exploration so the system does not only replay old co-occurrence. A retrain schedule only helps if someone checks how new catalog slices are doing.
