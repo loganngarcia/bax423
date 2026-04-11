@@ -1,7 +1,14 @@
 # Agent instructions
 
-- Write comments, readme, and writeups like a San Francisco entry-level software engineer, not like an academic. Prefer short sentences and concrete examples over theory dumps. Do not use em dashes, do not write the two-character ASCII arrow that looks like leads-to in prose, and avoid cramming extra thoughts inside parentheses. Use dashed lists. Stay clear and direct. Skip stiff formal openings and filler. 
-- Make folders assignment submission ready which means it .gitignore anything that professor doesn't need to see or shouldn't see
+- Write comments, readme, and writeups like a San Francisco entry-level software engineer, not like an academic. Prefer short sentences and concrete examples over theory dumps. Do not use em dashes, do not write the two-character ASCII arrow that looks like leads-to in prose, and avoid cramming extra thoughts inside parentheses. Use dashed lists. Stay clear and direct. Skip stiff formal openings and filler.
+
+## Zip-ready assignment folders
+
+Homework folders should be safe to zip for Canvas as-is. That means:
+
+- Put only deliverables the rubric asks for inside each `homework N/` tree. No meta checklists, scratch notes, or “how to submit” files in that folder. If we need a list, put it here in AGENTS or at repo root, not inside the folder the student will zip.
+- Use `.gitignore` so huge datasets, venvs, checkpoints, secrets, and local junk never land in git and never tempt anyone to upload them by mistake.
+- Keep handout PDFs and repro scripts outside the zip path when they are not graded, or document them in AGENTS only.
 
 ## HW2 Canvas zip (zip only inside `homework 2/`)
 
@@ -18,4 +25,4 @@ Do not put in the student zip:
 - `BAX423_HW2.pdf` handout, `complete_notebooks.py`, `patch_unsw_range.py`, `requirements.txt`, optional source `.md` if PDFs are enough
 - The two large CSVs in `DataFiles` (stay local; gitignored for size)
 
-This checklist lives in AGENTS so nothing extra sits in `homework 2/` that could get zipped by mistake.
+This list stays in AGENTS so `homework 2/` stays zip-ready and you do not ship meta files to Canvas.
