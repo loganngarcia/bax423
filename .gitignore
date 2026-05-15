@@ -37,3 +37,7 @@ homework 1/part2_mlx_run*.log
 homework 2/DataFiles/UNSW-NB15_1.csv
 homework 2/DataFiles/Wednesday-workingHours.pcap_ISCX.csv
 homework 2/.venv/
+
+# HW6 — Food.com raw CSVs are large local dataset files; keep out of Git
+homework 6/archive/
+homework 6/BAX423_HW6_Student_executed.html
